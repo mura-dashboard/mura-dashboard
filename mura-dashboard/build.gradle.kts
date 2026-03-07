@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
+
 plugins {
     java
     id("org.springframework.boot") version "4.0.3"
@@ -74,4 +76,8 @@ tasks.test {
 tasks.asciidoctor {
     inputs.dir(project.extra["snippetsDir"]!!)
     dependsOn(tasks.test)
+}
+
+tasks.named<BootBuildImage>("bootBuildImage") {
+    imageName.set("docker.io/muradashboard/mura-dashboard:latest")
 }
