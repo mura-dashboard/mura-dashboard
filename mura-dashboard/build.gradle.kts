@@ -80,4 +80,8 @@ tasks.asciidoctor {
 
 tasks.named<BootBuildImage>("bootBuildImage") {
     imageName.set("docker.io/muradashboard/mura-dashboard:latest")
+    environment.put("BP_HEALTH_CHECKER_ENABLED", "true")
+    buildpacks.set(listOf(
+        "urn:cnb:builder:paketo-buildpacks/java",
+        "docker.io/paketobuildpacks/health-checker:2"))
 }
