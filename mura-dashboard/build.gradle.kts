@@ -30,6 +30,12 @@ repositories {
 
 extra["snippetsDir"] = file("build/generated-snippets")
 
+dependencyManagement {
+    dependencies {
+        dependency("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
+    }
+}
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -37,13 +43,13 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.flywaydb:flyway-database-postgresql")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui")
 
     compileOnly("org.projectlombok:lombok")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 
-    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
     runtimeOnly("org.postgresql:postgresql")
 
     annotationProcessor("org.projectlombok:lombok")
@@ -56,7 +62,6 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
-    testImplementation("org.testcontainers:testcontainers-grafana")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
     testImplementation("org.testcontainers:testcontainers-postgresql")
 
@@ -78,6 +83,8 @@ tasks.asciidoctor {
 
 tasks.named<BootBuildImage>("bootBuildImage") {
     imageName.set("docker.io/muradashboard/mura-dashboard:latest")
+
+    // to package an internal health check e.g. for docker-compose
     environment.put("BP_HEALTH_CHECKER_ENABLED", "true")
     buildpacks.set(listOf(
         "urn:cnb:builder:paketo-buildpacks/java",
