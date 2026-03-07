@@ -1,0 +1,379 @@
+{
+    // a unique logical name, e.g the git repository, project name or application name
+    "name": "myproject",
+    // the gradle project module path, e.g `:libs:common` or `:app`
+    "modulePath": ":modules:search",
+    // the gradle test task name, e.g `test`, `integrationTest` or `functionalTest`
+    "testTaskName": "test",
+    "testsuites": [
+        {
+            // the test class name, e.g `com.example.testing.annotations.TestingBestPracticeTest`
+            "name": "com.example.testing.archunit.ArchUnitTest",
+            // the number of tests (methods) in the suite
+            "tests": 1,
+            // the number of skipped tests (methods) in the suite
+            "skipped": 0,
+            // the number of failed tests (methods) in the suite
+            "failures": 1,
+            // the number of errors in the suite
+            "errors": 0,
+            // the timestamp when the suite was executed `2025-12-04T09:59:15.026Z`
+            "timestamp": "2026-03-06T07:39:12.954Z",
+            // the time it took to execute the suite in seconds, e.g. `0.123`
+            "time": 0.006,
+            // the list of `testcase` XML elements (tests/methods) within the suite/class
+            "testcases": [
+                {
+                    // the test (method) name, e.g. `annotationIsAssignableToMethodAndLocalVariable()`
+                    "name": "no_deprecated_class_should_be_used()",
+                    // the class name, e.g `com.example.testing.annotations.TestingBestPracticeTest`
+                    "classname": "com.example.testing.archunit.ArchUnitTest",
+                    // the time it took to execute the test (method) in seconds, e.g. `0.03`
+                    "time": 0.006,
+                    // if the test failed, this contains the Failure details
+                    "failure": {
+                        // the failure message, e.g. `org.opentest4j.AssertionFailedError: &#10;expected: 2&#10; but was: 0`
+                        "message": "org.opentest4j.AssertionFailedError: &#10;expected: 2&#10; but was: 0",
+                        // the type of the failure, e.g. `org.opentest4j.AssertionFailedError`
+                        "type": "org.opentest4j.AssertionFailedError",
+                        // the details of the failure, e.g. the assertion error stack trace
+                        "details": "java.lang.AssertionError: \nExpecting actual:\n  2\nto be less than:\n  0 \n\tat com.example.FailingTest.flakyTest(TestingBestPracticeTest.java:27)\n\tat java.base/java.lang.reflect.Method.invoke(Method.java:580)\n\tat java.base/java.util.ArrayList.forEach(ArrayList.java:1596)\n\tat java.base/java.util.ArrayList.forEach(ArrayList.java:1596)"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "com.example.testing.archunit.ArchUnitBase$SpringTransactionalAnnotationShould",
+            "tests": 3,
+            "skipped": 0,
+            "failures": 0,
+            "errors": 0,
+            "timestamp": "2026-03-06T07:39:12.658Z",
+            "time": 0.007,
+            "testcases": [
+                {
+                    "name": "not_be_used_in_interface_method()",
+                    "classname": "com.example.testing.archunit.ArchUnitBase$SpringTransactionalAnnotationShould",
+                    "time": 0.002,
+                    "failure": null
+                },
+                {
+                    "name": "not_be_used_in_interface()",
+                    "classname": "com.example.testing.archunit.ArchUnitBase$SpringTransactionalAnnotationShould",
+                    "time": 0.002,
+                    "failure": null
+                },
+                {
+                    "name": "not_be_used_in_wicket()",
+                    "classname": "com.example.testing.archunit.ArchUnitBase$SpringTransactionalAnnotationShould",
+                    "time": 0.003,
+                    "failure": null
+                }
+            ]
+        },
+        {
+            "name": "com.example.testing.archunit.ArchUnitBase$SpringLazyAnnotationShould",
+            "tests": 2,
+            "skipped": 0,
+            "failures": 0,
+            "errors": 0,
+            "timestamp": "2026-03-06T07:39:12.612Z",
+            "time": 0.037,
+            "testcases": [
+                {
+                    "name": "not_be_used_at_all()",
+                    "classname": "com.example.testing.archunit.ArchUnitBase$SpringLazyAnnotationShould",
+                    "time": 0.001,
+                    "failure": null
+                },
+                {
+                    "name": "not_be_used_to_annotate_any_parameter_of_any_class_member()",
+                    "classname": "com.example.testing.archunit.ArchUnitBase$SpringLazyAnnotationShould",
+                    "time": 0.035,
+                    "failure": null
+                }
+            ]
+        },
+        {
+            "name": "com.example.testing.archunit.ArchUnitBase$TimedAnnotationShould",
+            "tests": 2,
+            "skipped": 0,
+            "failures": 0,
+            "errors": 0,
+            "timestamp": "2026-03-06T07:39:12.609Z",
+            "time": 0.002,
+            "testcases": [
+                {
+                    "name": "not_be_used_in_interface_method()",
+                    "classname": "com.example.testing.archunit.ArchUnitBase$TimedAnnotationShould",
+                    "time": 0.001,
+                    "failure": null
+                },
+                {
+                    "name": "not_be_used_in_interface()",
+                    "classname": "com.example.testing.archunit.ArchUnitBase$TimedAnnotationShould",
+                    "time": 0.001,
+                    "failure": null
+                }
+            ]
+        },
+        {
+            "name": "com.example.testing.archunit.ArchUnitBase$WicketCodeShould",
+            "tests": 2,
+            "skipped": 0,
+            "failures": 0,
+            "errors": 0,
+            "timestamp": "2026-03-06T07:39:12.598Z",
+            "time": 0.004,
+            "testcases": [
+                {
+                    "name": "notUse_IModel_flatMap()",
+                    "classname": "com.example.testing.archunit.ArchUnitBase$WicketCodeShould",
+                    "time": 0.002,
+                    "failure": null
+                },
+                {
+                    "name": "useSpringBeanAnnotation_onlyForPublicClasses()",
+                    "classname": "com.example.testing.archunit.ArchUnitBase$WicketCodeShould",
+                    "time": 0.001,
+                    "failure": null
+                }
+            ]
+        },
+        {
+            "name": "com.example.testing.archunit.ArchUnitBase$SpringBootAutoConfiguration",
+            "tests": 1,
+            "skipped": 0,
+            "failures": 0,
+            "errors": 0,
+            "timestamp": "2026-03-06T07:39:12.667Z",
+            "time": 0.279,
+            "testcases": [
+                {
+                    "name": "no_bean_method_in_AutoConfiguration_classes_should_call_other_bean_methods()",
+                    "classname": "com.example.testing.archunit.ArchUnitBase$SpringBootAutoConfiguration",
+                    "time": 0.279,
+                    "failure": null
+                }
+            ]
+        },
+        {
+            "name": "com.example.testing.archunit.ArchUnitBase$ConditionalOnClassAnnotationShould",
+            "tests": 1,
+            "skipped": 0,
+            "failures": 0,
+            "errors": 0,
+            "timestamp": "2026-03-06T07:39:12.604Z",
+            "time": 0.004,
+            "testcases": [
+                {
+                    "name": "not_be_used_to_annotate_methods()",
+                    "classname": "com.example.testing.archunit.ArchUnitBase$ConditionalOnClassAnnotationShould",
+                    "time": 0.004,
+                    "failure": null
+                }
+            ]
+        },
+        {
+            "name": "com.example.myproject.app.ArchUnitTest",
+            "tests": 26,
+            "skipped": 0,
+            "failures": 0,
+            "errors": 0,
+            "timestamp": "2026-03-06T07:39:12.516Z",
+            "time": 0.074,
+            "testcases": [
+                {
+                    "name": "1: use \"de.jato.wicket.component.select2.Select2MultiChoice\" instead of \"org.wicketstuff.select2.Select2MultiChoice\" because our internal Select2MultiChoice is adapted to our bootstrap version / theme",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.027,
+                    "failure": null
+                },
+                {
+                    "name": "2: use \"de.jato.wicket.component.feedback.FeedbackPanel\" instead of \"org.apache.wicket.markup.html.panel.FeedbackPanel\" because our internal FeedbackPanel is adapted to our bootstrap version / theme",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.001,
+                    "failure": null
+                },
+                {
+                    "name": "3: use \"de.jato.wicket.component.feedback.FencedFeedbackPanel\" instead of \"org.apache.wicket.markup.html.panel.FencedFeedbackPanel\" because our internal FeedbackPanel is adapted to our bootstrap version / theme",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.001,
+                    "failure": null
+                },
+                {
+                    "name": "4: use \"org.apache.commons.lang3.StringUtils\" instead of \"org.jvnet.jaxb2_commons.lang.StringUtils\" because jaxb2_commons StringUtils is internal and not part of it's API",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.001,
+                    "failure": null
+                },
+                {
+                    "name": "5: use \"org.apache.commons.lang3.StringUtils\" instead of \"io.micrometer.common.util.StringUtils\" because micrometer StringUtils is internal and not part of it's API",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.001,
+                    "failure": null
+                },
+                {
+                    "name": "6: use \"org.apache.commons.lang3.StringUtils\" instead of \"net.logstash.logback.util.StringUtils\" because logstash StringUtils is internal and not part of it's API",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.0,
+                    "failure": null
+                },
+                {
+                    "name": "7: use \"org.apache.commons.lang3.StringUtils\" instead of \"com.nimbusds.oauth2.sdk.util.StringUtils\" because nimbusds StringUtils is internal and not part of it's API",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.0,
+                    "failure": null
+                },
+                {
+                    "name": "8: use \"org.apache.commons.lang3.StringUtils\" instead of \"com.querydsl.core.util.StringUtils\" because querydsl StringUtils is internal and not part of it's API",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.0,
+                    "failure": null
+                },
+                {
+                    "name": "9: use \"org.apache.commons.lang3.StringUtils\" instead of \"org.apache.logging.log4j.util.Strings\" because log4j Strings is internal and not part of it's API",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.0,
+                    "failure": null
+                },
+                {
+                    "name": "10: use \"java.util.function.Supplier\" instead of \"org.apache.logging.log4j.util.Supplier\" because log4j Supplier is internal and not part of it's API",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.0,
+                    "failure": null
+                },
+                {
+                    "name": "11: use \"jakarta.annotation.Nullable\" instead of \"javax.annotation.Nullable\" because use jakarta namespace instead of javax",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.001,
+                    "failure": null
+                },
+                {
+                    "name": "12: use \"jakarta.annotation.Nonnull\" instead of \"javax.annotation.Nonnull\" because use jakarta namespace instead of javax",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.001,
+                    "failure": null
+                },
+                {
+                    "name": "13: use \"org.jspecify.annotations.NonNull\" instead of \"com.sun.istack.NotNull\" because use JSpecify Annotations instead of istack",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.0,
+                    "failure": null
+                },
+                {
+                    "name": "14: use \"org.jspecify.annotations.Nullable\" instead of \"com.sun.istack.Nullable\" because use JSpecify Annotations instead of istack",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.0,
+                    "failure": null
+                },
+                {
+                    "name": "15: use \"lombok.NonNull\" instead of \"org.checkerframework.checker.nullness.qual.NonNull\" because use lombok instead of checkerframework @NonNull annotation",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.001,
+                    "failure": null
+                },
+                {
+                    "name": "no_ObjectMapper_SpringBean_should_exist()",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.008,
+                    "failure": null
+                },
+                {
+                    "name": "authorized_annotation_is_only_allowed_at_public_methods()",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.001,
+                    "failure": null
+                },
+                {
+                    "name": "nullCheckAnnotations_exceptForJetbrainsAndLombok_shouldNotBeUsed()",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.001,
+                    "failure": null
+                },
+                {
+                    "name": "no_String_Field_should_be_annotated_with_Lob()",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.002,
+                    "failure": null
+                },
+                {
+                    "name": "no_EntityNotFoundException_should_be_used_in_repositories()",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.002,
+                    "failure": null
+                },
+                {
+                    "name": "1: JPA @Query should not contain \"org.springframework.data.jpa.repository.Query\"",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.006,
+                    "failure": null
+                },
+                {
+                    "name": "2: JPA @Query should not contain \"org.springframework.data.jpa.repository.Query\"",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.0,
+                    "failure": null
+                },
+                {
+                    "name": "subClasses_of_ListFilter_must_have_a_defaultConstructor()",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.0,
+                    "failure": null
+                },
+                {
+                    "name": "no_shaded_classes_should_be_used()",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.002,
+                    "failure": null
+                },
+                {
+                    "name": "no_junit4_should_be_used()",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.001,
+                    "failure": null
+                },
+                {
+                    "name": "no_javax_transactional_should_be_used()",
+                    "classname": "com.example.myproject.app.ArchUnitTest",
+                    "time": 0.002,
+                    "failure": null
+                }
+            ]
+        },
+        {
+            "name": "com.example.testing.archunit.ArchUnitBase$SpringCacheableShould",
+            "tests": 1,
+            "skipped": 0,
+            "failures": 0,
+            "errors": 0,
+            "timestamp": "2026-03-06T07:39:12.651Z",
+            "time": 0.005,
+            "testcases": [
+                {
+                    "name": "only_be_used_with_serializable_values_so_that_it_works_in_cluster()",
+                    "classname": "com.example.testing.archunit.ArchUnitBase$SpringCacheableShould",
+                    "time": 0.005,
+                    "failure": null
+                }
+            ]
+        },
+        {
+            "name": "com.example.testing.archunit.ArchUnitBase$Messaging",
+            "tests": 1,
+            "skipped": 0,
+            "failures": 0,
+            "errors": 0,
+            "timestamp": "2026-03-06T07:39:12.592Z",
+            "time": 0.004,
+            "testcases": [
+                {
+                    "name": "each_jmsListener_must_have_queue_or_topic_as_destination_suffix()",
+                    "classname": "com.example.testing.archunit.ArchUnitBase$Messaging",
+                    "time": 0.004,
+                    "failure": null
+                }
+            ]
+        }
+    ]
+}
