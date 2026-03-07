@@ -1,10 +1,4 @@
 services:
-  grafana-lgtm:
-    image: 'grafana/otel-lgtm:latest'
-    ports:
-      - '3000:3000'
-      - '4317'
-      - '4318'
   postgres:
     image: 'postgres:18'
     environment:
@@ -30,7 +24,6 @@ services:
       - 'SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/mura-dashboard'
       - 'SPRING_DATASOURCE_USERNAME=mura-dashboard'
       - 'SPRING_DATASOURCE_PASSWORD=mura4all!'
-      - 'OTEL_EXPORTER_OTLP_ENDPOINT=http://grafana-lgtm:4318'
       - 'THC_PATH=/actuator/health'
       - 'THC_PORT=8080'
     depends_on:
