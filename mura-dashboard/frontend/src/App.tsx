@@ -24,7 +24,7 @@ export default function App() {
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [totalElements, setTotalElements] = useState(0);
 
-  const [sortField, setSortField] = useState<SortField>('flakyCount');
+  const [sortField, setSortField] = useState<SortField>('flakinessRate');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
   const [fromDate, setFromDate] = useState<dayjs.Dayjs>(dayjs().subtract(7, 'day'));
@@ -74,7 +74,7 @@ export default function App() {
   };
 
   const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
+    setRowsPerPage(Number.parseInt(event.target.value, 10));
     setPage(0);
   };
 

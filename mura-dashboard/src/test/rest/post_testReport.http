@@ -1,4 +1,4 @@
-### POST test-reports without flaky test failure
+### submit test-reports without flaky test failure
 POST http://localhost:8080/api/test-reports
 Content-Type: application/json
 Authorization: Basic admin admin
@@ -27,7 +27,7 @@ Authorization: Basic admin admin
   ]
 }
 
-### POST test-reports with flaky test failure
+### submit test-reports with flaky test failure
 POST http://localhost:8080/api/test-reports
 Content-Type: application/json
 Authorization: Basic admin admin
