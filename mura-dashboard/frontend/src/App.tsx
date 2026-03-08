@@ -1,10 +1,24 @@
 import {useCallback, useEffect, useState} from 'react';
 import {AppBar, Box, Container, createTheme, CssBaseline, ThemeProvider, Toolbar, Typography,} from '@mui/material';
+import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
+import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import FlakyTestTable from './FlakyTestTable';
 import DateRangeFilter from './DateRangeFilter';
 import {fetchFlakyTests} from './api';
 import {FlakyTestSummary, SortField, SortOrder} from './types';
 import dayjs from 'dayjs';
+
+function useBrowserLocale() {
+  const [locale, setLocale] = useState('en');
+  useEffect(() => {
+    const lang = navigator.language?.split('-')[0] || 'en';
+    if (lang === 'en') return;
+    import(`dayjs/locale/${lang}.js`)
+      .then(() => setLocale(lang))
+      .catch(() => { /* fallback to 'en' */ });
+  }, []);
+  return locale;
+}
 
 const theme = createTheme({
   palette: {
@@ -79,6 +93,7 @@ const theme = createTheme({
 });
 
 export default function App() {
+  const locale = useBrowserLocale();
   const [rows, setRows] = useState<FlakyTestSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -149,6 +164,7 @@ export default function App() {
 
   return (
     <ThemeProvider theme={theme}>
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={locale}>
       <CssBaseline />
       <AppBar
         position="static"
@@ -216,6 +232,7 @@ export default function App() {
           />
         </Box>
       </Container>
+      </LocalizationProvider>
     </ThemeProvider>
   );
 }

@@ -1,4 +1,5 @@
-import {Button, Paper, Stack, TextField, Typography} from '@mui/material';
+import {Button, Paper, Stack, Typography} from '@mui/material';
+import {DatePicker} from '@mui/x-date-pickers/DatePicker';
 import {FilterList} from '@mui/icons-material';
 import dayjs from 'dayjs';
 import {useState} from 'react';
@@ -10,19 +11,29 @@ interface DateRangeFilterProps {
 }
 
 export default function DateRangeFilter({ from, to, onChange }: DateRangeFilterProps) {
-  const [localFrom, setLocalFrom] = useState(from.format('YYYY-MM-DD'));
-  const [localTo, setLocalTo] = useState(to.format('YYYY-MM-DD'));
+  const [localFrom, setLocalFrom] = useState<dayjs.Dayjs | null>(from);
+  const [localTo, setLocalTo] = useState<dayjs.Dayjs | null>(to);
 
   const handleApply = () => {
-    onChange(dayjs(localFrom).startOf('day'), dayjs(localTo).endOf('day'));
+    if (localFrom && localTo) {
+      onChange(localFrom.startOf('day'), localTo.endOf('day'));
+    }
   };
 
   const handlePreset = (days: number) => {
     const newTo = dayjs();
     const newFrom = newTo.subtract(days, 'day');
-    setLocalFrom(newFrom.format('YYYY-MM-DD'));
-    setLocalTo(newTo.format('YYYY-MM-DD'));
+    setLocalFrom(newFrom);
+    setLocalTo(newTo);
     onChange(newFrom.startOf('day'), newTo.endOf('day'));
+  };
+
+  const dateFieldSx = {
+    width: 170,
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': { borderColor: '#2A4A5C' },
+      '&:hover fieldset': { borderColor: '#2EC4B6' },
+    },
   };
 
   return (
@@ -42,33 +53,19 @@ export default function DateRangeFilter({ from, to, onChange }: DateRangeFilterP
       <Typography variant="body2" sx={{ color: '#8BA8B8', fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>
         Date Range
       </Typography>
-      <TextField
+      <DatePicker
         label="From"
-        type="date"
-        size="small"
         value={localFrom}
-        onChange={e => setLocalFrom(e.target.value)}
-        slotProps={{ inputLabel: { shrink: true } }}
-        sx={{
-          '& .MuiOutlinedInput-root': {
-            '& fieldset': { borderColor: '#2A4A5C' },
-            '&:hover fieldset': { borderColor: '#2EC4B6' },
-          },
-        }}
+        onChange={(v) => setLocalFrom(v)}
+        slotProps={{ textField: { size: 'small' } }}
+        sx={dateFieldSx}
       />
-      <TextField
+      <DatePicker
         label="To"
-        type="date"
-        size="small"
         value={localTo}
-        onChange={e => setLocalTo(e.target.value)}
-        slotProps={{ inputLabel: { shrink: true } }}
-        sx={{
-          '& .MuiOutlinedInput-root': {
-            '& fieldset': { borderColor: '#2A4A5C' },
-            '&:hover fieldset': { borderColor: '#2EC4B6' },
-          },
-        }}
+        onChange={(v) => setLocalTo(v)}
+        slotProps={{ textField: { size: 'small' } }}
+        sx={dateFieldSx}
       />
       <Button variant="contained" size="small" onClick={handleApply}>
         Apply
