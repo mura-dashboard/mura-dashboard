@@ -1,7 +1,7 @@
 package com.github.muradashboard.app.testreport;
 
-import com.github.muradashboard.app.testreport.dto.FlakyTestPageResponse;
-import com.github.muradashboard.app.testreport.dto.FlakyTestSummary;
+import com.github.muradashboard.app.presentation.rest.testreport.dto.FlakyTestPageResponse;
+import com.github.muradashboard.app.presentation.rest.testreport.dto.FlakyTestSummary;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

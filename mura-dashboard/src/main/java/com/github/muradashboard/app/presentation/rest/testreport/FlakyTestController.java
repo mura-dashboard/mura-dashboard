@@ -1,6 +1,7 @@
-package com.github.muradashboard.app.testreport;
+package com.github.muradashboard.app.presentation.rest.testreport;
 
-import com.github.muradashboard.app.testreport.dto.FlakyTestPageResponse;
+import com.github.muradashboard.app.presentation.rest.testreport.dto.FlakyTestPageResponse;
+import com.github.muradashboard.app.testreport.FlakyTestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

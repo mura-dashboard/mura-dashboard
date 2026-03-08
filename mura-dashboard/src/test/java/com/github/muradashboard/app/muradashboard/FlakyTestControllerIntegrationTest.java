@@ -187,12 +187,72 @@ class FlakyTestControllerIntegrationTest {
                 .andExpect(jsonPath("$.content[1].classname").value("com.example.AlphaTest"));
     }
 
+    @Test
+    void shouldCountRetriesWithinSameReportAsOneRun() throws Exception {
+        Instant now = Instant.now();
+        // Simulate a flaky test with retries in a single report:
+        // The test failed once and then passed on retry (2 test_case rows, both marked flaky).
+        // This should count as 1 totalRun and 1 flakyCount, not 2.
+        insertSingleReportWithRetries("com.example.RetryTest", "testRetry",
+                2, true, now.minus(1, ChronoUnit.DAYS));
+
+        mockMvc.perform(get("/rapi/flaky-tests"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].classname").value("com.example.RetryTest"))
+                .andExpect(jsonPath("$.content[0].totalRuns").value(1))
+                .andExpect(jsonPath("$.content[0].flakyCount").value(1));
+    }
+
     /**
-     * Inserts test data: a report containing a single suite with {@code totalRuns}
-     * test cases for the given class/name. {@code flakyCount} of those will be marked
-     * as flaky (is_flaky = true), the rest will not.
+     * Inserts test data: creates {@code totalRuns} separate reports, each containing
+     * a single test case for the given class/name. The first {@code flakyCount} reports
+     * will have the test case marked as flaky.
      */
     private void insertFlakyTestData(String classname, String name, int totalRuns, int flakyCount, Instant createdAt) {
+        for (int i = 0; i < totalRuns; i++) {
+            final int reportIndex = i;
+            final boolean isFlaky = reportIndex < flakyCount;
+            transactionTemplate.executeWithoutResult(status -> {
+                TestReportEntity report = new TestReportEntity();
+                report.setName("report-" + classname + "-" + reportIndex);
+                report.setModulePath(":");
+                report.setTestTaskName("test");
+                report.setCreatedAt(createdAt.plusSeconds(reportIndex));
+
+                TestSuiteEntity suite = new TestSuiteEntity();
+                suite.setName("suite-" + classname);
+                suite.setTests(1);
+                suite.setSkipped(0);
+                suite.setFailures(0);
+                suite.setErrors(0);
+                suite.setTimestamp(createdAt.plusSeconds(reportIndex));
+                suite.setTime(1.0);
+                suite.setTestReport(report);
+
+                TestCaseEntity testCase = new TestCaseEntity();
+                testCase.setClassname(classname);
+                testCase.setName(name);
+                testCase.setTime(0.1);
+                testCase.setFlaky(isFlaky);
+                testCase.setTestSuite(suite);
+                suite.getTestCases().add(testCase);
+
+                report.getTestSuites().add(suite);
+                entityManager.persist(report);
+            });
+        }
+    }
+
+    /**
+     * Inserts a single report with multiple test_case rows for the same test
+     * (simulating retries within one test suite). All rows are marked with the
+     * given flaky flag. This models the real-world retry scenario where a flaky
+     * test has multiple entries within the same report.
+     */
+    private void insertSingleReportWithRetries(String classname, String name,
+                                                int numberOfEntries, boolean flaky,
+                                                Instant createdAt) {
         transactionTemplate.executeWithoutResult(status -> {
             TestReportEntity report = new TestReportEntity();
             report.setName("report-" + classname);
@@ -202,7 +262,7 @@ class FlakyTestControllerIntegrationTest {
 
             TestSuiteEntity suite = new TestSuiteEntity();
             suite.setName("suite-" + classname);
-            suite.setTests(totalRuns);
+            suite.setTests(numberOfEntries);
             suite.setSkipped(0);
             suite.setFailures(0);
             suite.setErrors(0);
@@ -210,12 +270,12 @@ class FlakyTestControllerIntegrationTest {
             suite.setTime(1.0);
             suite.setTestReport(report);
 
-            for (int i = 0; i < totalRuns; i++) {
+            for (int i = 0; i < numberOfEntries; i++) {
                 TestCaseEntity testCase = new TestCaseEntity();
                 testCase.setClassname(classname);
                 testCase.setName(name);
                 testCase.setTime(0.1);
-                testCase.setFlaky(i < flakyCount);
+                testCase.setFlaky(flaky);
                 testCase.setTestSuite(suite);
                 suite.getTestCases().add(testCase);
             }

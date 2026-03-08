@@ -22,9 +22,9 @@ public class FlakyTestQueryRepository {
     private static final String BASE_QUERY = """
             SELECT tc.classname AS classname,
                    tc.name AS name,
-                   COUNT(*) AS totalRuns,
-                   SUM(CASE WHEN tc.is_flaky THEN 1 ELSE 0 END) AS flakyCount,
-                   CAST(SUM(CASE WHEN tc.is_flaky THEN 1 ELSE 0 END) AS double precision) / COUNT(*) AS flakinessRate,
+                   COUNT(DISTINCT tr.id) AS totalRuns,
+                   COUNT(DISTINCT CASE WHEN tc.is_flaky THEN tr.id END) AS flakyCount,
+                   CAST(COUNT(DISTINCT CASE WHEN tc.is_flaky THEN tr.id END) AS double precision) / COUNT(DISTINCT tr.id) AS flakinessRate,
                    MAX(tr.created_at) AS lastSeen
             FROM test_case tc
             JOIN test_suite ts ON tc.test_suite_id = ts.id
@@ -32,7 +32,7 @@ public class FlakyTestQueryRepository {
             WHERE tr.created_at >= :from
               AND tr.created_at <= :to
             GROUP BY tc.classname, tc.name
-            HAVING SUM(CASE WHEN tc.is_flaky THEN 1 ELSE 0 END) > 0
+            HAVING COUNT(DISTINCT CASE WHEN tc.is_flaky THEN tr.id END) > 0
             """;
 
     private static final String COUNT_QUERY = """
@@ -44,7 +44,7 @@ public class FlakyTestQueryRepository {
                 WHERE tr.created_at >= :from
                   AND tr.created_at <= :to
                 GROUP BY tc.classname, tc.name
-                HAVING SUM(CASE WHEN tc.is_flaky THEN 1 ELSE 0 END) > 0
+                HAVING COUNT(DISTINCT CASE WHEN tc.is_flaky THEN tr.id END) > 0
             ) sub
             """;
 

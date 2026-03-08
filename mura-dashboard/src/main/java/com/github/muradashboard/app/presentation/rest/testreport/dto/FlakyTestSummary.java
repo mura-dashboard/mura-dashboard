@@ -1,4 +1,4 @@
-package com.github.muradashboard.app.testreport.dto;
+package com.github.muradashboard.app.presentation.rest.testreport.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
