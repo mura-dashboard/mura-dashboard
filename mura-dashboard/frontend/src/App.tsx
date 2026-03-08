@@ -13,32 +13,7 @@ function useBrowserLocale() {
   useEffect(() => {
     const lang = navigator.language?.split('-')[0]?.toLowerCase() || 'en';
     if (lang === 'en') return;
-    // Explicit lazy imports so Vite can statically resolve each chunk
-    const localeLoaders: Record<string, () => Promise<unknown>> = {
-      de: () => import('dayjs/locale/de'),
-      fr: () => import('dayjs/locale/fr'),
-      es: () => import('dayjs/locale/es'),
-      it: () => import('dayjs/locale/it'),
-      pt: () => import('dayjs/locale/pt'),
-      nl: () => import('dayjs/locale/nl'),
-      ja: () => import('dayjs/locale/ja'),
-      ko: () => import('dayjs/locale/ko'),
-      zh: () => import('dayjs/locale/zh-cn'),
-      ru: () => import('dayjs/locale/ru'),
-      pl: () => import('dayjs/locale/pl'),
-      sv: () => import('dayjs/locale/sv'),
-      da: () => import('dayjs/locale/da'),
-      fi: () => import('dayjs/locale/fi'),
-      nb: () => import('dayjs/locale/nb'),
-      tr: () => import('dayjs/locale/tr'),
-      cs: () => import('dayjs/locale/cs'),
-      uk: () => import('dayjs/locale/uk'),
-      hu: () => import('dayjs/locale/hu'),
-      ro: () => import('dayjs/locale/ro'),
-    };
-    const loader = localeLoaders[lang];
-    if (!loader) return;
-    loader()
+    import(`dayjs/locale/${lang}`)
       .then(() => setLocale(lang))
       .catch(() => { /* fallback to en */ });
   }, []);
