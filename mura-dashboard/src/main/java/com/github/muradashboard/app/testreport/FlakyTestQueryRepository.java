@@ -15,7 +15,8 @@ import java.util.Set;
 public class FlakyTestQueryRepository {
 
     private static final Set<String> ALLOWED_SORT_COLUMNS = Set.of(
-            "flakycount", "flakinessrate", "totalruns", "lastseen", "classname", "name"
+            "flakycount", "flakinessrate", "totalruns", "lastseen", "classname", "name",
+            "reportname", "modulepath", "testtaskname"
     );
 
     private static final Set<String> ALLOWED_STATUSES = Set.of("FLAKY", "FAILED", "SUCCESSFUL");
@@ -23,7 +24,10 @@ public class FlakyTestQueryRepository {
     private final EntityManager em;
 
     private static final String BASE_SELECT = """
-            SELECT tc.classname AS classname,
+            SELECT tr.name AS reportName,
+                   tr.module_path AS modulePath,
+                   tr.test_task_name AS testTaskName,
+                   tc.classname AS classname,
                    tc.name AS name,
                    COUNT(DISTINCT tr.id) AS totalRuns,
                    COUNT(DISTINCT CASE WHEN tc.is_flaky THEN tr.id END) AS flakyCount,
@@ -35,18 +39,18 @@ public class FlakyTestQueryRepository {
             JOIN test_report tr ON ts.test_report_id = tr.id
             WHERE tr.created_at >= :from
               AND tr.created_at <= :to
-            GROUP BY tc.classname, tc.name
+            GROUP BY tr.name, tr.module_path, tr.test_task_name, tc.classname, tc.name
             """;
 
     private static final String COUNT_SELECT = """
             SELECT COUNT(*) FROM (
-                SELECT tc.classname, tc.name
+                SELECT tr.name, tr.module_path, tr.test_task_name, tc.classname, tc.name
                 FROM test_case tc
                 JOIN test_suite ts ON tc.test_suite_id = ts.id
                 JOIN test_report tr ON ts.test_report_id = tr.id
                 WHERE tr.created_at >= :from
                   AND tr.created_at <= :to
-                GROUP BY tc.classname, tc.name
+                GROUP BY tr.name, tr.module_path, tr.test_task_name, tc.classname, tc.name
             """;
 
     private static final String COUNT_SUFFIX = ") sub";

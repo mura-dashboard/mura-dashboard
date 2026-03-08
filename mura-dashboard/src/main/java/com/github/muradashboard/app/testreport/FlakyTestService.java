@@ -28,16 +28,19 @@ public class FlakyTestService {
 
         var content = rows.stream()
                 .map(row -> {
-                    long flakyCount = ((Number) row[3]).longValue();
-                    long failedCount = ((Number) row[6]).longValue();
+                    long flakyCount = ((Number) row[6]).longValue();
+                    long failedCount = ((Number) row[9]).longValue();
                     String testStatus = computeTestStatus(flakyCount, failedCount);
                     return new FlakyTestSummary(
-                            (String) row[0],
-                            (String) row[1],
-                            ((Number) row[2]).longValue(),
+                            (String) row[0],  // reportName
+                            (String) row[1],  // modulePath
+                            (String) row[2],  // testTaskName
+                            (String) row[3],  // classname
+                            (String) row[4],  // name
+                            ((Number) row[5]).longValue(),  // totalRuns
                             flakyCount,
-                            ((Number) row[4]).doubleValue(),
-                            toInstant(row[5]),
+                            ((Number) row[7]).doubleValue(),  // flakinessRate
+                            toInstant(row[8]),  // lastSeen
                             testStatus
                     );
                 })

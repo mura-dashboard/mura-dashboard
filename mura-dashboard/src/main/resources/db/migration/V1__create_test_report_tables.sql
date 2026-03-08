@@ -45,3 +45,5 @@ CREATE INDEX idx_test_report_created_at ON test_report (created_at);
 -- GROUP BY classname + name, with is_flaky for the HAVING filter
 CREATE INDEX idx_test_case_classname_name ON test_case (classname, name);
 CREATE INDEX idx_test_case_is_flaky ON test_case (is_flaky);
+
+CREATE INDEX idx_test_report_grouping ON test_report (name, module_path, test_task_name);

@@ -47,6 +47,36 @@ function formatDate(iso: string): string {
 
 const columns: Column[] = [
   {
+    id: 'reportName',
+    label: 'Report Name',
+    minWidth: 160,
+    format: (row) => (
+      <Typography variant="body2" sx={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '0.8rem', color: '#E8F4F8' }}>
+        {row.reportName}
+      </Typography>
+    ),
+  },
+  {
+    id: 'modulePath',
+    label: 'Module Path',
+    minWidth: 150,
+    format: (row) => (
+      <Typography variant="body2" sx={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '0.8rem', color: '#E8F4F8' }}>
+        {row.modulePath}
+      </Typography>
+    ),
+  },
+  {
+    id: 'testTaskName',
+    label: 'Test Task',
+    minWidth: 120,
+    format: (row) => (
+      <Typography variant="body2" sx={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '0.8rem', color: '#E8F4F8' }}>
+        {row.testTaskName}
+      </Typography>
+    ),
+  },
+  {
     id: 'classname',
     label: 'Test Class',
     minWidth: 250,
@@ -223,7 +253,7 @@ export default function FlakyTestTable({
             {rows.map((row, idx) => (
               <TableRow
                 hover
-                key={`${row.classname}-${row.name}-${idx}`}
+                key={`${row.reportName}-${row.modulePath}-${row.testTaskName}-${row.classname}-${row.name}-${idx}`}
                 sx={{
                   '&:hover': { backgroundColor: 'rgba(46,196,182,0.04)' },
                 }}

@@ -3,6 +3,9 @@ export type TestStatus = 'FLAKY' | 'FAILED' | 'SUCCESSFUL';
 export const ALL_TEST_STATUSES: TestStatus[] = ['FLAKY', 'FAILED', 'SUCCESSFUL'];
 
 export interface FlakyTestSummary {
+  reportName: string;
+  modulePath: string;
+  testTaskName: string;
   classname: string;
   name: string;
   totalRuns: number;
@@ -20,5 +23,5 @@ export interface FlakyTestPageResponse {
   totalPages: number;
 }
 
-export type SortField = 'flakyCount' | 'flakinessRate' | 'totalRuns' | 'lastSeen' | 'classname' | 'name';
+export type SortField = 'flakyCount' | 'flakinessRate' | 'totalRuns' | 'lastSeen' | 'classname' | 'name' | 'reportName' | 'modulePath' | 'testTaskName';
 export type SortOrder = 'asc' | 'desc';

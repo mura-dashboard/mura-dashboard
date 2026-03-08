@@ -50,9 +50,9 @@ class FlakyTestControllerIntegrationTest {
     @Test
     void shouldReturnFlakyTestsSortedByFlakyCountDescByDefault() throws Exception {
         Instant now = Instant.now();
-        insertFlakyTestData("com.example.AlphaTest", "testA", 5, 3, now.minus(1, ChronoUnit.DAYS));
-        insertFlakyTestData("com.example.BetaTest", "testB", 10, 7, now.minus(2, ChronoUnit.DAYS));
-        insertFlakyTestData("com.example.GammaTest", "testC", 4, 1, now.minus(3, ChronoUnit.DAYS));
+        insertFlakyTestData("com.example.AlphaTest", "testA", "my-project", ":", "test", 5, 3, now.minus(1, ChronoUnit.DAYS));
+        insertFlakyTestData("com.example.BetaTest", "testB", "my-project", ":", "test", 10, 7, now.minus(2, ChronoUnit.DAYS));
+        insertFlakyTestData("com.example.GammaTest", "testC", "my-project", ":", "test", 4, 1, now.minus(3, ChronoUnit.DAYS));
 
         mockMvc.perform(get("/rapi/flaky-tests"))
                 .andExpect(status().isOk())
@@ -63,6 +63,9 @@ class FlakyTestControllerIntegrationTest {
                 // Default sort is flakyCount desc: BetaTest(7) > AlphaTest(3) > GammaTest(1)
                 .andExpect(jsonPath("$.content[0].classname").value("com.example.BetaTest"))
                 .andExpect(jsonPath("$.content[0].flakyCount").value(7))
+                .andExpect(jsonPath("$.content[0].reportName").value("my-project"))
+                .andExpect(jsonPath("$.content[0].modulePath").value(":"))
+                .andExpect(jsonPath("$.content[0].testTaskName").value("test"))
                 .andExpect(jsonPath("$.content[1].classname").value("com.example.AlphaTest"))
                 .andExpect(jsonPath("$.content[1].flakyCount").value(3))
                 .andExpect(jsonPath("$.content[2].classname").value("com.example.GammaTest"))
@@ -73,9 +76,9 @@ class FlakyTestControllerIntegrationTest {
     void shouldSortByFlakinessRateAscending() throws Exception {
         Instant now = Instant.now();
         // AlphaTest: 3/5 = 0.60, BetaTest: 7/10 = 0.70, GammaTest: 1/4 = 0.25
-        insertFlakyTestData("com.example.AlphaTest", "testA", 5, 3, now.minus(1, ChronoUnit.DAYS));
-        insertFlakyTestData("com.example.BetaTest", "testB", 10, 7, now.minus(2, ChronoUnit.DAYS));
-        insertFlakyTestData("com.example.GammaTest", "testC", 4, 1, now.minus(3, ChronoUnit.DAYS));
+        insertFlakyTestData("com.example.AlphaTest", "testA", "my-project", ":", "test", 5, 3, now.minus(1, ChronoUnit.DAYS));
+        insertFlakyTestData("com.example.BetaTest", "testB", "my-project", ":", "test", 10, 7, now.minus(2, ChronoUnit.DAYS));
+        insertFlakyTestData("com.example.GammaTest", "testC", "my-project", ":", "test", 4, 1, now.minus(3, ChronoUnit.DAYS));
 
         mockMvc.perform(get("/rapi/flaky-tests")
                         .param("sort", "flakinessRate")
@@ -92,7 +95,7 @@ class FlakyTestControllerIntegrationTest {
     void shouldRespectPagination() throws Exception {
         Instant now = Instant.now();
         for (int i = 1; i <= 5; i++) {
-            insertFlakyTestData("com.example.Test" + i, "test" + i, 10, i, now.minus(1, ChronoUnit.DAYS));
+            insertFlakyTestData("com.example.Test" + i, "test" + i, "my-project", ":", "test", 10, i, now.minus(1, ChronoUnit.DAYS));
         }
 
         // Page 0, size 2, sort by flakyCount desc: Test5(5), Test4(4)
@@ -124,9 +127,9 @@ class FlakyTestControllerIntegrationTest {
     void shouldFilterByDateRange() throws Exception {
         Instant now = Instant.now();
         // One report from 2 days ago (within default 7-day range)
-        insertFlakyTestData("com.example.RecentTest", "testRecent", 5, 3, now.minus(2, ChronoUnit.DAYS));
+        insertFlakyTestData("com.example.RecentTest", "testRecent", "my-project", ":", "test", 5, 3, now.minus(2, ChronoUnit.DAYS));
         // One report from 20 days ago (outside default 7-day range)
-        insertFlakyTestData("com.example.OldTest", "testOld", 8, 6, now.minus(20, ChronoUnit.DAYS));
+        insertFlakyTestData("com.example.OldTest", "testOld", "my-project", ":", "test", 8, 6, now.minus(20, ChronoUnit.DAYS));
 
         // Default: last 7 days — should only return RecentTest
         mockMvc.perform(get("/rapi/flaky-tests"))
@@ -148,7 +151,7 @@ class FlakyTestControllerIntegrationTest {
     void shouldReturnEmptyPageWhenNoFlakyTests() throws Exception {
         Instant now = Instant.now();
         // Insert non-flaky test data (0 flaky out of 5 runs)
-        insertFlakyTestData("com.example.StableTest", "testStable", 5, 0, now.minus(1, ChronoUnit.DAYS));
+        insertFlakyTestData("com.example.StableTest", "testStable", "my-project", ":", "test", 5, 0, now.minus(1, ChronoUnit.DAYS));
 
         mockMvc.perform(get("/rapi/flaky-tests"))
                 .andExpect(status().isOk())
@@ -159,23 +162,66 @@ class FlakyTestControllerIntegrationTest {
     @Test
     void shouldAggregateAcrossMultipleReports() throws Exception {
         Instant now = Instant.now();
-        // Same test class+name across multiple reports should be aggregated
-        insertFlakyTestData("com.example.FlakyTest", "testFlaky", 3, 2, now.minus(1, ChronoUnit.DAYS));
-        insertFlakyTestData("com.example.FlakyTest", "testFlaky", 4, 1, now.minus(2, ChronoUnit.DAYS));
+        // Same test class+name+report+module+task across multiple reports should be aggregated
+        insertFlakyTestData("com.example.FlakyTest", "testFlaky", "my-project", ":", "test", 3, 2, now.minus(1, ChronoUnit.DAYS));
+        insertFlakyTestData("com.example.FlakyTest", "testFlaky", "my-project", ":", "test", 4, 1, now.minus(2, ChronoUnit.DAYS));
 
         mockMvc.perform(get("/rapi/flaky-tests"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(1)))
                 .andExpect(jsonPath("$.content[0].classname").value("com.example.FlakyTest"))
                 .andExpect(jsonPath("$.content[0].totalRuns").value(7))       // 3 + 4
-                .andExpect(jsonPath("$.content[0].flakyCount").value(3));     // 2 + 1
+                .andExpect(jsonPath("$.content[0].flakyCount").value(3))      // 2 + 1
+                .andExpect(jsonPath("$.content[0].reportName").value("my-project"))
+                .andExpect(jsonPath("$.content[0].modulePath").value(":"))
+                .andExpect(jsonPath("$.content[0].testTaskName").value("test"));
+    }
+
+    @Test
+    void shouldNotAggregateAcrossDifferentModules() throws Exception {
+        Instant now = Instant.now();
+        // Same classname+name but different module paths should NOT be aggregated
+        insertFlakyTestData("com.example.FlakyTest", "testFlaky", "my-project", ":module-a", "test", 3, 2, now.minus(1, ChronoUnit.DAYS));
+        insertFlakyTestData("com.example.FlakyTest", "testFlaky", "my-project", ":module-b", "test", 4, 1, now.minus(2, ChronoUnit.DAYS));
+
+        mockMvc.perform(get("/rapi/flaky-tests"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[0].modulePath").value(":module-a"))
+                .andExpect(jsonPath("$.content[0].totalRuns").value(3))
+                .andExpect(jsonPath("$.content[1].modulePath").value(":module-b"))
+                .andExpect(jsonPath("$.content[1].totalRuns").value(4));
+    }
+
+    @Test
+    void shouldNotAggregateAcrossDifferentProjects() throws Exception {
+        Instant now = Instant.now();
+        // Same classname+name but different report names (projects) should NOT be aggregated
+        insertFlakyTestData("com.example.FlakyTest", "testFlaky", "project-alpha", ":", "test", 5, 3, now.minus(1, ChronoUnit.DAYS));
+        insertFlakyTestData("com.example.FlakyTest", "testFlaky", "project-beta", ":", "test", 6, 2, now.minus(2, ChronoUnit.DAYS));
+
+        mockMvc.perform(get("/rapi/flaky-tests"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(2)));
+    }
+
+    @Test
+    void shouldNotAggregateAcrossDifferentTestTasks() throws Exception {
+        Instant now = Instant.now();
+        // Same classname+name but different test task names should NOT be aggregated
+        insertFlakyTestData("com.example.FlakyTest", "testFlaky", "my-project", ":", "test", 5, 3, now.minus(1, ChronoUnit.DAYS));
+        insertFlakyTestData("com.example.FlakyTest", "testFlaky", "my-project", ":", "integrationTest", 6, 2, now.minus(2, ChronoUnit.DAYS));
+
+        mockMvc.perform(get("/rapi/flaky-tests"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(2)));
     }
 
     @Test
     void shouldFallBackToDefaultSortForInvalidColumn() throws Exception {
         Instant now = Instant.now();
-        insertFlakyTestData("com.example.AlphaTest", "testA", 5, 3, now.minus(1, ChronoUnit.DAYS));
-        insertFlakyTestData("com.example.BetaTest", "testB", 10, 7, now.minus(2, ChronoUnit.DAYS));
+        insertFlakyTestData("com.example.AlphaTest", "testA", "my-project", ":", "test", 5, 3, now.minus(1, ChronoUnit.DAYS));
+        insertFlakyTestData("com.example.BetaTest", "testB", "my-project", ":", "test", 10, 7, now.minus(2, ChronoUnit.DAYS));
 
         // Invalid sort column silently falls back to flakyCount
         mockMvc.perform(get("/rapi/flaky-tests")
@@ -194,6 +240,7 @@ class FlakyTestControllerIntegrationTest {
         // The test failed once and then passed on retry (2 test_case rows, both marked flaky).
         // This should count as 1 totalRun and 1 flakyCount, not 2.
         insertSingleReportWithRetries("com.example.RetryTest", "testRetry",
+                "my-project", ":", "test",
                 2, true, now.minus(1, ChronoUnit.DAYS));
 
         mockMvc.perform(get("/rapi/flaky-tests"))
@@ -209,15 +256,17 @@ class FlakyTestControllerIntegrationTest {
      * a single test case for the given class/name. The first {@code flakyCount} reports
      * will have the test case marked as flaky.
      */
-    private void insertFlakyTestData(String classname, String name, int totalRuns, int flakyCount, Instant createdAt) {
+    private void insertFlakyTestData(String classname, String name,
+                                      String reportName, String modulePath, String testTaskName,
+                                      int totalRuns, int flakyCount, Instant createdAt) {
         for (int i = 0; i < totalRuns; i++) {
             final int reportIndex = i;
             final boolean isFlaky = reportIndex < flakyCount;
             transactionTemplate.executeWithoutResult(status -> {
                 TestReportEntity report = new TestReportEntity();
-                report.setName("report-" + classname + "-" + reportIndex);
-                report.setModulePath(":");
-                report.setTestTaskName("test");
+                report.setName(reportName);
+                report.setModulePath(modulePath);
+                report.setTestTaskName(testTaskName);
                 report.setCreatedAt(createdAt.plusSeconds(reportIndex));
 
                 TestSuiteEntity suite = new TestSuiteEntity();
@@ -251,13 +300,14 @@ class FlakyTestControllerIntegrationTest {
      * test has multiple entries within the same report.
      */
     private void insertSingleReportWithRetries(String classname, String name,
+                                                String reportName, String modulePath, String testTaskName,
                                                 int numberOfEntries, boolean flaky,
                                                 Instant createdAt) {
         transactionTemplate.executeWithoutResult(status -> {
             TestReportEntity report = new TestReportEntity();
-            report.setName("report-" + classname);
-            report.setModulePath(":");
-            report.setTestTaskName("test");
+            report.setName(reportName);
+            report.setModulePath(modulePath);
+            report.setTestTaskName(testTaskName);
             report.setCreatedAt(createdAt);
 
             TestSuiteEntity suite = new TestSuiteEntity();

@@ -6,6 +6,9 @@ import java.time.Instant;
 
 @Schema(description = "Aggregated test summary")
 public record FlakyTestSummary(
+        @Schema(description = "Test report name (project identifier)") String reportName,
+        @Schema(description = "Module path within the project") String modulePath,
+        @Schema(description = "Test task name (e.g. test, integrationTest)") String testTaskName,
         @Schema(description = "Fully qualified class name") String classname,
         @Schema(description = "Test method name") String name,
         @Schema(description = "Total number of runs in the date range") long totalRuns,

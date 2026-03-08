@@ -45,7 +45,7 @@ public class FlakyTestController {
             @Parameter(description = "Sort direction: asc or desc")
             @RequestParam(defaultValue = "desc") String order,
 
-            @Parameter(description = "Test statuses to include: FLAKY, FAILED, SUCCESSFUL")
+            @Parameter(description = "Test statuses to include: FLAKY, FAILED, SUCCESSFUL. Defaults to FLAKY if not provided.")
             @RequestParam(required = false) List<String> statuses
     ) {
         Instant now = Instant.now();
@@ -54,6 +54,11 @@ public class FlakyTestController {
         }
         if (from == null) {
             from = to.minus(7, ChronoUnit.DAYS);
+        }
+
+        // Default to showing only flaky tests when the client does not provide a statuses filter
+        if (statuses == null || statuses.isEmpty()) {
+            statuses = List.of("FLAKY");
         }
 
         FlakyTestPageResponse response = flakyTestService.getFlakyTests(from, to, page, size, sort, order, statuses);
