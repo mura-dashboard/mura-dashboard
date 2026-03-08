@@ -4,8 +4,9 @@ import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import FlakyTestTable from './FlakyTestTable';
 import DateRangeFilter from './DateRangeFilter';
+import TestStatusFilter from './TestStatusFilter';
 import {fetchFlakyTests} from './api';
-import {FlakyTestSummary, SortField, SortOrder} from './types';
+import {FlakyTestSummary, SortField, SortOrder, TestStatus} from './types';
 import dayjs from 'dayjs';
 
 // Vite cannot resolve dynamic imports with template-literal variables for
@@ -152,6 +153,8 @@ export default function App() {
   const [fromDate, setFromDate] = useState<dayjs.Dayjs>(dayjs().subtract(7, 'day'));
   const [toDate, setToDate] = useState<dayjs.Dayjs>(dayjs());
 
+  const [statuses, setStatuses] = useState<TestStatus[]>(['FLAKY']);
+
   const loadData = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -163,6 +166,7 @@ export default function App() {
         size: rowsPerPage,
         sort: sortField,
         order: sortOrder,
+        statuses,
       });
       setRows(data.content);
       setTotalElements(data.totalElements);
@@ -175,7 +179,7 @@ export default function App() {
     } finally {
       setLoading(false);
     }
-  }, [fromDate, toDate, page, rowsPerPage, sortField, sortOrder]);
+  }, [fromDate, toDate, page, rowsPerPage, sortField, sortOrder, statuses]);
 
   useEffect(() => {
     loadData();
@@ -203,6 +207,11 @@ export default function App() {
   const handleDateChange = (from: dayjs.Dayjs, to: dayjs.Dayjs) => {
     setFromDate(from);
     setToDate(to);
+    setPage(0);
+  };
+
+  const handleStatusChange = (newStatuses: TestStatus[]) => {
+    setStatuses(newStatuses);
     setPage(0);
   };
 
@@ -255,11 +264,17 @@ export default function App() {
         </Toolbar>
       </AppBar>
       <Container maxWidth="xl" sx={{ mt: 3, mb: 3 }}>
-        <DateRangeFilter
-          from={fromDate}
-          to={toDate}
-          onChange={handleDateChange}
-        />
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, flexWrap: 'wrap' }}>
+          <DateRangeFilter
+            from={fromDate}
+            to={toDate}
+            onChange={handleDateChange}
+          />
+          <TestStatusFilter
+            statuses={statuses}
+            onChange={handleStatusChange}
+          />
+        </Box>
         <Box sx={{ mt: 2 }}>
           <FlakyTestTable
             rows={rows}

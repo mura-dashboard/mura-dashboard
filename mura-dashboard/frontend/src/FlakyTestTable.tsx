@@ -14,13 +14,14 @@ import {
   TableSortLabel,
   Typography,
 } from '@mui/material';
-import {FlakyTestSummary, SortField, SortOrder} from './types';
+import {FlakyTestSummary, SortField, SortOrder, TestStatus} from './types';
 
 interface Column {
-  id: SortField;
+  id: string;
   label: string;
   align?: 'left' | 'right' | 'center';
   minWidth?: number;
+  sortable?: boolean;
   format?: (value: FlakyTestSummary) => React.ReactNode;
 }
 
@@ -29,6 +30,12 @@ function severityColor(rate: number): 'error' | 'warning' | 'success' {
   if (rate >= 0.2) return 'warning';
   return 'success';
 }
+
+const STATUS_CHIP_CONFIG: Record<TestStatus, { label: string; color: 'warning' | 'error' | 'success' }> = {
+  FLAKY: { label: 'Flaky', color: 'warning' },
+  FAILED: { label: 'Failed', color: 'error' },
+  SUCCESSFUL: { label: 'Successful', color: 'success' },
+};
 
 function formatRate(rate: number): string {
   return `${(rate * 100).toFixed(1)}%`;
@@ -58,6 +65,24 @@ const columns: Column[] = [
         {row.name}
       </Typography>
     ),
+  },
+  {
+    id: 'testStatus',
+    label: 'Status',
+    align: 'center',
+    minWidth: 110,
+    sortable: false,
+    format: (row) => {
+      const config = STATUS_CHIP_CONFIG[row.testStatus] ?? STATUS_CHIP_CONFIG.FLAKY;
+      return (
+        <Chip
+          label={config.label}
+          color={config.color}
+          size="small"
+          variant="outlined"
+        />
+      );
+    },
   },
   {
     id: 'flakyCount',
@@ -166,17 +191,21 @@ export default function FlakyTestTable({
                     letterSpacing: '0.04em',
                   }}
                 >
-                  <TableSortLabel
-                    active={sortField === col.id}
-                    direction={sortField === col.id ? sortOrder : 'asc'}
-                    onClick={() => onSortChange(col.id)}
-                    sx={{
-                      '&.Mui-active': { color: '#2EC4B6' },
-                      '& .MuiTableSortLabel-icon': { color: '#2EC4B6 !important' },
-                    }}
-                  >
-                    {col.label}
-                  </TableSortLabel>
+                  {col.sortable === false ? (
+                    col.label
+                  ) : (
+                    <TableSortLabel
+                      active={sortField === col.id}
+                      direction={sortField === col.id ? sortOrder : 'asc'}
+                      onClick={() => onSortChange(col.id as SortField)}
+                      sx={{
+                        '&.Mui-active': { color: '#2EC4B6' },
+                        '& .MuiTableSortLabel-icon': { color: '#2EC4B6 !important' },
+                      }}
+                    >
+                      {col.label}
+                    </TableSortLabel>
+                  )}
                 </TableCell>
               ))}
             </TableRow>

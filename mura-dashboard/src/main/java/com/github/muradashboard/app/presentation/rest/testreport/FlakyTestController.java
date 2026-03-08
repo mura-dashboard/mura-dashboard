@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @RestController
 @RequestMapping("/rapi/flaky-tests")
@@ -42,7 +43,10 @@ public class FlakyTestController {
             @RequestParam(defaultValue = "flakinessRate") String sort,
 
             @Parameter(description = "Sort direction: asc or desc")
-            @RequestParam(defaultValue = "desc") String order
+            @RequestParam(defaultValue = "desc") String order,
+
+            @Parameter(description = "Test statuses to include: FLAKY, FAILED, SUCCESSFUL")
+            @RequestParam(required = false) List<String> statuses
     ) {
         Instant now = Instant.now();
         if (to == null) {
@@ -52,7 +56,7 @@ public class FlakyTestController {
             from = to.minus(7, ChronoUnit.DAYS);
         }
 
-        FlakyTestPageResponse response = flakyTestService.getFlakyTests(from, to, page, size, sort, order);
+        FlakyTestPageResponse response = flakyTestService.getFlakyTests(from, to, page, size, sort, order, statuses);
         return ResponseEntity.ok(response);
     }
 }

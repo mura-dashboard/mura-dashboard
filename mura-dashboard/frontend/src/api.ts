@@ -1,4 +1,4 @@
-import {FlakyTestPageResponse, SortField, SortOrder} from './types';
+import {FlakyTestPageResponse, SortField, SortOrder, TestStatus} from './types';
 
 interface FetchFlakyTestsParams {
   from: string;
@@ -7,6 +7,7 @@ interface FetchFlakyTestsParams {
   size: number;
   sort: SortField;
   order: SortOrder;
+  statuses: TestStatus[];
 }
 
 export async function fetchFlakyTests(params: FetchFlakyTestsParams): Promise<FlakyTestPageResponse> {
@@ -18,6 +19,10 @@ export async function fetchFlakyTests(params: FetchFlakyTestsParams): Promise<Fl
     sort: params.sort,
     order: params.order,
   });
+
+  for (const status of params.statuses) {
+    searchParams.append('statuses', status);
+  }
 
   const response = await fetch(`/rapi/flaky-tests?${searchParams.toString()}`);
 

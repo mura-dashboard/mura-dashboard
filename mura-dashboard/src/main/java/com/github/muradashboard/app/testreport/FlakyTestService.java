@@ -19,26 +19,43 @@ public class FlakyTestService {
     @Transactional(readOnly = true)
     public FlakyTestPageResponse getFlakyTests(Instant from, Instant to,
                                                 int page, int size,
-                                                String sortBy, String order) {
+                                                String sortBy, String order,
+                                                List<String> statuses) {
         int offset = page * size;
 
-        List<Object[]> rows = flakyTestQueryRepository.findFlakyTests(from, to, sortBy, order, offset, size);
-        long total = flakyTestQueryRepository.countFlakyTests(from, to);
+        List<Object[]> rows = flakyTestQueryRepository.findTests(from, to, statuses, sortBy, order, offset, size);
+        long total = flakyTestQueryRepository.countTests(from, to, statuses);
 
         var content = rows.stream()
-                .map(row -> new FlakyTestSummary(
-                        (String) row[0],
-                        (String) row[1],
-                        ((Number) row[2]).longValue(),
-                        ((Number) row[3]).longValue(),
-                        ((Number) row[4]).doubleValue(),
-                        toInstant(row[5])
-                ))
+                .map(row -> {
+                    long flakyCount = ((Number) row[3]).longValue();
+                    long failedCount = ((Number) row[6]).longValue();
+                    String testStatus = computeTestStatus(flakyCount, failedCount);
+                    return new FlakyTestSummary(
+                            (String) row[0],
+                            (String) row[1],
+                            ((Number) row[2]).longValue(),
+                            flakyCount,
+                            ((Number) row[4]).doubleValue(),
+                            toInstant(row[5]),
+                            testStatus
+                    );
+                })
                 .toList();
 
         int totalPages = size > 0 ? (int) Math.ceil((double) total / size) : 0;
 
         return new FlakyTestPageResponse(content, page, size, total, totalPages);
+    }
+
+    private String computeTestStatus(long flakyCount, long failedCount) {
+        if (flakyCount > 0) {
+            return "FLAKY";
+        } else if (failedCount > 0) {
+            return "FAILED";
+        } else {
+            return "SUCCESSFUL";
+        }
     }
 
     private Instant toInstant(Object value) {

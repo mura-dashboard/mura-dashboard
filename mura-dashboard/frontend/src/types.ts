@@ -1,3 +1,7 @@
+export type TestStatus = 'FLAKY' | 'FAILED' | 'SUCCESSFUL';
+
+export const ALL_TEST_STATUSES: TestStatus[] = ['FLAKY', 'FAILED', 'SUCCESSFUL'];
+
 export interface FlakyTestSummary {
   classname: string;
   name: string;
@@ -5,6 +9,7 @@ export interface FlakyTestSummary {
   flakyCount: number;
   flakinessRate: number;
   lastSeen: string;
+  testStatus: TestStatus;
 }
 
 export interface FlakyTestPageResponse {
