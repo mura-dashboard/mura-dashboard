@@ -19,6 +19,7 @@ bin/
 
 ### IntelliJ IDEA ###
 .idea
+!.idea/sqldialects.xml
 *.iws
 *.iml
 *.ipr

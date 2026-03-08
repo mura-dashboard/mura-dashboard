@@ -4,6 +4,9 @@ import com.github.muradashboard.app.testreport.TestReportRepository;
 import com.github.muradashboard.app.testreport.entity.TestCaseEntity;
 import com.github.muradashboard.app.testreport.entity.TestReportEntity;
 import com.github.muradashboard.app.testreport.entity.TestSuiteEntity;
+import org.apache.commons.lang3.time.StopWatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -16,9 +19,13 @@ import java.util.List;
 @TestConfiguration
 public class TestDataConfiguration {
 
+    private static final Logger logger = LoggerFactory.getLogger(TestDataConfiguration.class);
+
     @Bean
     ApplicationRunner testDataInitializer(TestReportRepository reportRepository) {
-        return args -> {
+        return _ -> {
+            StopWatch stopWatch = StopWatch.createStarted();
+            logger.info("Initializing test data ...");
             var now = Instant.now();
             var reports = new ArrayList<TestReportEntity>();
 
@@ -33,10 +40,50 @@ public class TestDataConfiguration {
                                         passed("shouldDeleteUser", "com.example.app.UserServiceTest", 0.05),
                                         passed("shouldListAllUsers", "com.example.app.UserServiceTest", 0.80))),
                         suite("com.example.app.OrderServiceTest", now.minus(i, ChronoUnit.HOURS),
-                                3, 0, 0, 0, 0.5, List.of(
+                                6, 0, 0, 0, 0.5, List.of(
                                         passed("shouldCreateOrder", "com.example.app.OrderServiceTest", 0.20),
                                         passed("shouldCancelOrder", "com.example.app.OrderServiceTest", 0.15),
-                                        passed("shouldCalculateTotal", "com.example.app.OrderServiceTest", 0.15))))));
+                                        passed("shouldCalculateAvg", "com.example.app.OrderServiceTest", 0.20),
+                                        passed("shouldCalculateMax", "com.example.app.OrderServiceTest", 0.20),
+                                        passed("shouldCalculateMin", "com.example.app.OrderServiceTest", 0.20),
+                                        passed("shouldCalculateTotal", "com.example.app.OrderServiceTest", 0.15)))
+                )));
+                if (i % 10 == 0) {
+                    reports.add(report("10% flaky", ":app", "test", now.minus(100, ChronoUnit.HOURS), List.of(
+                            suite("com.example.app.OrderServiceTest", now.minus(100, ChronoUnit.HOURS),
+                                    3, 0, 1, 0, 0.5, List.of(
+                                            flakyPassed("shouldCreateOrder", "com.example.app.OrderServiceTest", 0.20),
+                                            flakyFailed("shouldCreateOrder", "com.example.app.OrderServiceTest", 0.20, "fail1", "type", "details"),
+                                            passed("shouldCalculateTotal", "com.example.app.OrderServiceTest", 0.15))))));
+                }
+                if (i % 5 == 0) {
+                    reports.add(report("15% flaky", ":app", "test", now.minus(100, ChronoUnit.HOURS), List.of(
+                            suite("com.example.app.OrderServiceTest", now.minus(100, ChronoUnit.HOURS),
+                                    2, 0, 2, 0, 0.5, List.of(
+                                            flakyFailed("shouldCalculateTotal", "com.example.app.OrderServiceTest", 0.20, "fail1", "type", "details"),
+                                            flakyPassed("shouldCalculateTotal", "com.example.app.OrderServiceTest", 0.15))))));
+                }
+                if (i % 4 == 0) {
+                    reports.add(report("20% flaky", ":app", "test", now.minus(100, ChronoUnit.HOURS), List.of(
+                            suite("com.example.app.OrderServiceTest", now.minus(100, ChronoUnit.HOURS),
+                                    2, 0, 2, 0, 0.5, List.of(
+                                            flakyFailed("shouldCalculateAvg", "com.example.app.OrderServiceTest", 0.20, "fail1", "type", "details"),
+                                            flakyPassed("shouldCalculateAvg", "com.example.app.OrderServiceTest", 0.15))))));
+                }
+                if (i % 3 == 0) {
+                    reports.add(report("25% flaky", ":app", "test", now.minus(100, ChronoUnit.HOURS), List.of(
+                            suite("com.example.app.OrderServiceTest", now.minus(100, ChronoUnit.HOURS),
+                                    2, 0, 2, 0, 0.5, List.of(
+                                            flakyFailed("shouldCalculateMin", "com.example.app.OrderServiceTest", 0.20, "fail1", "type", "details"),
+                                            flakyPassed("shouldCalculateMin", "com.example.app.OrderServiceTest", 0.15))))));
+                }
+                if (i % 2 == 0) {
+                    reports.add(report("33% flaky", ":app", "test", now.minus(100, ChronoUnit.HOURS), List.of(
+                            suite("com.example.app.OrderServiceTest", now.minus(100, ChronoUnit.HOURS),
+                                    2, 0, 2, 0, 0.5, List.of(
+                                            flakyFailed("shouldCalculateMax", "com.example.app.OrderServiceTest", 0.20, "fail1", "type", "details"),
+                                            flakyPassed("shouldCalculateMax", "com.example.app.OrderServiceTest", 0.15))))));
+                }
             }
             reports.add(report("1% flaky", ":app", "test", now.minus(100, ChronoUnit.HOURS), List.of(
                     suite("com.example.app.UserServiceTest", now.minus(100, ChronoUnit.HOURS),
@@ -47,8 +94,9 @@ public class TestDataConfiguration {
                                     passed("shouldDeleteUser", "com.example.app.UserServiceTest", 0.05),
                                     passed("shouldListAllUsers", "com.example.app.UserServiceTest", 0.80))),
                     suite("com.example.app.OrderServiceTest", now.minus(100, ChronoUnit.HOURS),
-                            3, 0, 0, 0, 0.5, List.of(
-                                    passed("shouldCreateOrder", "com.example.app.OrderServiceTest", 0.20),
+                            13, 0, 10, 0, 0.5, List.of(
+                                    flakyPassed("shouldCreateOrder", "com.example.app.OrderServiceTest", 0.20),
+                                    flakyFailed("shouldCreateOrder", "com.example.app.OrderServiceTest", 0.20, "fail1", "type", "details"),
                                     flakyPassed("shouldCancelOrder", "com.example.app.OrderServiceTest", 0.15),
                                     flakyFailed("shouldCancelOrder", "com.example.app.OrderServiceTest", 0.15, "fail1", "type", "details"),
                                     flakyFailed("shouldCancelOrder", "com.example.app.OrderServiceTest", 0.15, "fail2", "type", "details"),
@@ -60,6 +108,18 @@ public class TestDataConfiguration {
                                     flakyFailed("shouldCancelOrder", "com.example.app.OrderServiceTest", 0.15, "fail8", "type", "details"),
                                     flakyFailed("shouldCancelOrder", "com.example.app.OrderServiceTest", 0.15, "fail9", "type", "details"),
                                     passed("shouldCalculateTotal", "com.example.app.OrderServiceTest", 0.15))))));
+
+            // ─── Project: mass-flaky-data flaky, Module: :app ────────────────────────────
+            for (int i = 0; i < 1_000; i++) {
+                final Instant createdAt = now.minus(8, ChronoUnit.DAYS).minusSeconds(i);
+                reports.add(report("mass-flaky-data", ":app", "test", createdAt, List.of(
+                        suite("com.foo.app.OrderServiceTest" + i, createdAt,
+                                3, 0, 1, 0, 0.5, List.of(
+                                        flakyPassed("shouldCreateOrder" + i , "com.foo.app.OrderServiceTest" + i, 0.20),
+                                        flakyFailed("shouldCreateOrder" + i, "com.foo.app.OrderServiceTest" + i, 0.20, "fail1", "type", "details"),
+                                        passed("shouldCalculateTotal" + i, "com.foo.app.OrderServiceTest" + i, 0.15)))
+                )));
+            }
 
             // ─── Project: my-app, Module: :app ────────────────────────────
 
@@ -309,7 +369,10 @@ public class TestDataConfiguration {
                             1, 0, 0, 0, 3.0, List.of(
                                     flakyPassed("shouldSendPushToIos", "com.example.notify.PushNotificationTest", 3.00))))));
 
-            reportRepository.saveAll(reports);
+            reportRepository.saveAllAndFlush(reports);
+
+            stopWatch.stop();
+            logger.info("Test data initialization complete: {} reports created in {}", reports.size(), stopWatch.getDuration());
         };
     }
 

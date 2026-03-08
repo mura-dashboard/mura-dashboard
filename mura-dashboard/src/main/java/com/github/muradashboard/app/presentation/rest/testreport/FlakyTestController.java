@@ -16,14 +16,14 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 @RestController
-@RequestMapping("/rapi")
+@RequestMapping("/rapi/flaky-tests")
 @RequiredArgsConstructor
 @Tag(name = "Flaky Tests", description = "Endpoints for querying flaky test data")
 public class FlakyTestController {
 
     private final FlakyTestService flakyTestService;
 
-    @GetMapping("/flaky-tests")
+    @GetMapping
     @Operation(summary = "List flaky tests with pagination, sorting, and date range filter")
     public ResponseEntity<FlakyTestPageResponse> getFlakyTests(
             @Parameter(description = "Start of date range (ISO-8601). Defaults to 7 days ago.")
@@ -39,7 +39,7 @@ public class FlakyTestController {
             @RequestParam(defaultValue = "20") int size,
 
             @Parameter(description = "Sort field: flakyCount, flakinessRate, totalRuns, lastSeen, classname, name")
-            @RequestParam(defaultValue = "flakyCount") String sort,
+            @RequestParam(defaultValue = "flakinessRate") String sort,
 
             @Parameter(description = "Sort direction: asc or desc")
             @RequestParam(defaultValue = "desc") String order
