@@ -31,7 +31,7 @@ public class TestDataConfiguration {
 
             // ─── Project: 1% flaky, Module: :app ────────────────────────────
             for (int i = 0; i < 99; i++) {
-                reports.add(report("1% flaky", ":app", "test", now.minus(i, ChronoUnit.HOURS), List.of(
+                reports.add(report("% flaky", ":app", "test", now.minus(i, ChronoUnit.HOURS), List.of(
                         suite("com.example.app.UserServiceTest", now.minus(i, ChronoUnit.HOURS),
                                 5, 0, 0, 0, 1.2, List.of(
                                         passed("shouldCreateUser", "com.example.app.UserServiceTest", 0.15),
@@ -49,7 +49,7 @@ public class TestDataConfiguration {
                                         passed("shouldCalculateTotal", "com.example.app.OrderServiceTest", 0.15)))
                 )));
                 if (i % 10 == 0) {
-                    reports.add(report("10% flaky", ":app", "test", now.minus(100, ChronoUnit.HOURS), List.of(
+                    reports.add(report("% flaky", ":app", "test", now.minus(100, ChronoUnit.HOURS), List.of(
                             suite("com.example.app.OrderServiceTest", now.minus(100, ChronoUnit.HOURS),
                                     3, 0, 1, 0, 0.5, List.of(
                                             flakyPassed("shouldCreateOrder", "com.example.app.OrderServiceTest", 0.20),
@@ -57,35 +57,35 @@ public class TestDataConfiguration {
                                             passed("shouldCalculateTotal", "com.example.app.OrderServiceTest", 0.15))))));
                 }
                 if (i % 5 == 0) {
-                    reports.add(report("15% flaky", ":app", "test", now.minus(100, ChronoUnit.HOURS), List.of(
+                    reports.add(report("% flaky", ":app", "test", now.minus(100, ChronoUnit.HOURS), List.of(
                             suite("com.example.app.OrderServiceTest", now.minus(100, ChronoUnit.HOURS),
                                     2, 0, 2, 0, 0.5, List.of(
                                             flakyFailed("shouldCalculateTotal", "com.example.app.OrderServiceTest", 0.20, "fail1", "type", "details"),
                                             flakyPassed("shouldCalculateTotal", "com.example.app.OrderServiceTest", 0.15))))));
                 }
                 if (i % 4 == 0) {
-                    reports.add(report("20% flaky", ":app", "test", now.minus(100, ChronoUnit.HOURS), List.of(
+                    reports.add(report("% flaky", ":app", "test", now.minus(100, ChronoUnit.HOURS), List.of(
                             suite("com.example.app.OrderServiceTest", now.minus(100, ChronoUnit.HOURS),
                                     2, 0, 2, 0, 0.5, List.of(
                                             flakyFailed("shouldCalculateAvg", "com.example.app.OrderServiceTest", 0.20, "fail1", "type", "details"),
                                             flakyPassed("shouldCalculateAvg", "com.example.app.OrderServiceTest", 0.15))))));
                 }
                 if (i % 3 == 0) {
-                    reports.add(report("25% flaky", ":app", "test", now.minus(100, ChronoUnit.HOURS), List.of(
+                    reports.add(report("% flaky", ":app", "test", now.minus(100, ChronoUnit.HOURS), List.of(
                             suite("com.example.app.OrderServiceTest", now.minus(100, ChronoUnit.HOURS),
                                     2, 0, 2, 0, 0.5, List.of(
                                             flakyFailed("shouldCalculateMin", "com.example.app.OrderServiceTest", 0.20, "fail1", "type", "details"),
                                             flakyPassed("shouldCalculateMin", "com.example.app.OrderServiceTest", 0.15))))));
                 }
                 if (i % 2 == 0) {
-                    reports.add(report("33% flaky", ":app", "test", now.minus(100, ChronoUnit.HOURS), List.of(
+                    reports.add(report("% flaky", ":app", "test", now.minus(100, ChronoUnit.HOURS), List.of(
                             suite("com.example.app.OrderServiceTest", now.minus(100, ChronoUnit.HOURS),
                                     2, 0, 2, 0, 0.5, List.of(
                                             flakyFailed("shouldCalculateMax", "com.example.app.OrderServiceTest", 0.20, "fail1", "type", "details"),
                                             flakyPassed("shouldCalculateMax", "com.example.app.OrderServiceTest", 0.15))))));
                 }
             }
-            reports.add(report("1% flaky", ":app", "test", now.minus(100, ChronoUnit.HOURS), List.of(
+            reports.add(report("% flaky", ":app", "test", now.minus(100, ChronoUnit.HOURS), List.of(
                     suite("com.example.app.UserServiceTest", now.minus(100, ChronoUnit.HOURS),
                             5, 0, 0, 0, 1.2, List.of(
                                     passed("shouldCreateUser", "com.example.app.UserServiceTest", 0.15),
