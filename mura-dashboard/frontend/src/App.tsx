@@ -8,12 +8,56 @@ import {fetchFlakyTests} from './api';
 import {FlakyTestSummary, SortField, SortOrder} from './types';
 import dayjs from 'dayjs';
 
+// Vite cannot resolve dynamic imports with template-literal variables for
+// node_modules packages (e.g. import(`dayjs/locale/${lang}`)). Use a map of
+// static import paths so Vite can analyse and pre-bundle them correctly.
+// Each import is lazy-loaded – only the locale matching the browser is fetched.
+const dayjsLocaleLoaders: Record<string, () => Promise<unknown>> = {
+  af: () => import('dayjs/locale/af'),
+  ar: () => import('dayjs/locale/ar'),
+  bg: () => import('dayjs/locale/bg'),
+  ca: () => import('dayjs/locale/ca'),
+  cs: () => import('dayjs/locale/cs'),
+  da: () => import('dayjs/locale/da'),
+  de: () => import('dayjs/locale/de'),
+  el: () => import('dayjs/locale/el'),
+  es: () => import('dayjs/locale/es'),
+  et: () => import('dayjs/locale/et'),
+  fi: () => import('dayjs/locale/fi'),
+  fr: () => import('dayjs/locale/fr'),
+  he: () => import('dayjs/locale/he'),
+  hi: () => import('dayjs/locale/hi'),
+  hr: () => import('dayjs/locale/hr'),
+  hu: () => import('dayjs/locale/hu'),
+  id: () => import('dayjs/locale/id'),
+  it: () => import('dayjs/locale/it'),
+  ja: () => import('dayjs/locale/ja'),
+  ko: () => import('dayjs/locale/ko'),
+  lt: () => import('dayjs/locale/lt'),
+  lv: () => import('dayjs/locale/lv'),
+  nb: () => import('dayjs/locale/nb'),
+  nl: () => import('dayjs/locale/nl'),
+  pl: () => import('dayjs/locale/pl'),
+  pt: () => import('dayjs/locale/pt'),
+  ro: () => import('dayjs/locale/ro'),
+  ru: () => import('dayjs/locale/ru'),
+  sk: () => import('dayjs/locale/sk'),
+  sl: () => import('dayjs/locale/sl'),
+  sr: () => import('dayjs/locale/sr'),
+  sv: () => import('dayjs/locale/sv'),
+  th: () => import('dayjs/locale/th'),
+  tr: () => import('dayjs/locale/tr'),
+  uk: () => import('dayjs/locale/uk'),
+  vi: () => import('dayjs/locale/vi'),
+  zh: () => import('dayjs/locale/zh'),
+};
+
 function useBrowserLocale() {
   const [locale, setLocale] = useState('en');
   useEffect(() => {
     const lang = navigator.language?.split('-')[0]?.toLowerCase() || 'en';
-    if (lang === 'en') return;
-    import(`dayjs/locale/${lang}`)
+    if (lang === 'en' || !dayjsLocaleLoaders[lang]) return;
+    dayjsLocaleLoaders[lang]()
       .then(() => setLocale(lang))
       .catch(() => { /* fallback to en */ });
   }, []);
