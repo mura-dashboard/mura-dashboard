@@ -1,7 +1,19 @@
 import {useCallback, useEffect, useState} from 'react';
-import {AppBar, Box, Container, createTheme, CssBaseline, ThemeProvider, Toolbar, Typography,} from '@mui/material';
+import {
+  AppBar,
+  Box,
+  Container,
+  createTheme,
+  CssBaseline,
+  Divider,
+  Paper,
+  ThemeProvider,
+  Toolbar,
+  Typography,
+} from '@mui/material';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
+import {FilterList} from '@mui/icons-material';
 import FlakyTestTable from './FlakyTestTable';
 import DateRangeFilter from './DateRangeFilter';
 import TestStatusFilter from './TestStatusFilter';
@@ -264,17 +276,30 @@ export default function App() {
         </Toolbar>
       </AppBar>
       <Container maxWidth="xl" sx={{ mt: 3, mb: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, flexWrap: 'wrap' }}>
+        <Paper
+          variant="outlined"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            flexWrap: 'wrap',
+            p: 2,
+            borderColor: '#2A4A5C',
+            borderRadius: 2,
+          }}
+        >
+          <FilterList sx={{ color: '#2EC4B6' }} />
           <DateRangeFilter
             from={fromDate}
             to={toDate}
             onChange={handleDateChange}
           />
+          <Divider orientation="vertical" flexItem sx={{ borderColor: '#2A4A5C', mx: 1 }} />
           <TestStatusFilter
             statuses={statuses}
             onChange={handleStatusChange}
           />
-        </Box>
+        </Paper>
         <Box sx={{ mt: 2 }}>
           <FlakyTestTable
             rows={rows}

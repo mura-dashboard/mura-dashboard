@@ -1,6 +1,5 @@
-import {Button, Paper, Stack, Typography} from '@mui/material';
+import {Button, Stack} from '@mui/material';
 import {DatePicker} from '@mui/x-date-pickers/DatePicker';
-import {FilterList} from '@mui/icons-material';
 import dayjs from 'dayjs';
 import {useState} from 'react';
 
@@ -37,22 +36,7 @@ export default function DateRangeFilter({ from, to, onChange }: DateRangeFilterP
   };
 
   return (
-    <Paper
-      variant="outlined"
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 2,
-        flexWrap: 'wrap',
-        p: 2,
-        borderColor: '#2A4A5C',
-        borderRadius: 2,
-      }}
-    >
-      <FilterList sx={{ color: '#2EC4B6' }} />
-      <Typography variant="body2" sx={{ color: '#8BA8B8', fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>
-        Date Range
-      </Typography>
+    <>
       <DatePicker
         label="From"
         value={localFrom}
@@ -81,6 +65,6 @@ export default function DateRangeFilter({ from, to, onChange }: DateRangeFilterP
           Last 30d
         </Button>
       </Stack>
-    </Paper>
+    </>
   );
 }
