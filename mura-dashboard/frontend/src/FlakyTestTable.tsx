@@ -1,8 +1,15 @@
+import React, {useEffect, useMemo, useState} from 'react';
 import {
   Alert,
   Box,
+  Checkbox,
   Chip,
+  IconButton,
   LinearProgress,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
   Paper,
   Table,
   TableBody,
@@ -12,8 +19,10 @@ import {
   TablePagination,
   TableRow,
   TableSortLabel,
+  Toolbar,
   Typography,
 } from '@mui/material';
+import {FilterList} from '@mui/icons-material';
 import {FlakyTestSummary, SortField, SortOrder, TestStatus} from './types';
 
 interface Column {
@@ -188,6 +197,49 @@ export default function FlakyTestTable({
   onPageChange,
   onRowsPerPageChange,
 }: FlakyTestTableProps) {
+  // column visibility state with localStorage persistence
+  const LOCALSTORAGE_KEY = 'mura.flakyTestTable.visibleColumns';
+  const DEFAULT_HIDDEN = new Set(['testTaskName', 'lastSeen']);
+
+  const [visible, setVisible] = useState<Record<string, boolean>>(() => {
+    if (typeof window === 'undefined') {
+      const temp: Record<string, boolean> = {};
+      columns.forEach(c => (temp[c.id] = !DEFAULT_HIDDEN.has(c.id)));
+      return temp;
+    }
+    try {
+      const raw = localStorage.getItem(LOCALSTORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const m: Record<string, boolean> = {};
+        columns.forEach(c => {
+          m[c.id] = typeof parsed[c.id] === 'boolean' ? parsed[c.id] : !DEFAULT_HIDDEN.has(c.id);
+        });
+        return m;
+      }
+    } catch {
+      /* ignore parse errors */
+    }
+    const m: Record<string, boolean> = {};
+    columns.forEach(c => (m[c.id] = !DEFAULT_HIDDEN.has(c.id)));
+    return m;
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(visible));
+    } catch {
+      // ignore storage errors
+    }
+  }, [visible]);
+
+  const displayedColumns = useMemo(() => columns.filter(c => visible[c.id] !== false), [visible]);
+
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const openColumnMenu = (e: React.MouseEvent<HTMLElement>) => setAnchorEl(e.currentTarget);
+  const closeColumnMenu = () => setAnchorEl(null);
+  const toggleColumn = (id: string) => setVisible(prev => ({ ...prev, [id]: !(prev[id] ?? true) }));
+
   if (error) {
     return <Alert severity="error">{error}</Alert>;
   }
@@ -202,48 +254,63 @@ export default function FlakyTestTable({
       }}
     >
       {loading && <LinearProgress color="primary" />}
+      <Toolbar sx={{ display: 'flex', justifyContent: 'flex-end', px: 2 }}>
+        <IconButton size="small" onClick={openColumnMenu} aria-label="Show / hide columns">
+          <FilterList />
+        </IconButton>
+        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={closeColumnMenu}>
+          {columns.map((col) => (
+            <MenuItem key={col.id} onClick={() => toggleColumn(col.id)}>
+              <ListItemIcon>
+                <Checkbox edge="start" checked={visible[col.id] ?? true} tabIndex={-1} disableRipple />
+              </ListItemIcon>
+              <ListItemText>{col.label}</ListItemText>
+            </MenuItem>
+          ))}
+        </Menu>
+      </Toolbar>
       <TableContainer sx={{ maxHeight: 'calc(100vh - 260px)' }}>
         <Table stickyHeader size="small">
           <TableHead>
-            <TableRow>
-              {columns.map((col) => (
-                <TableCell
-                  key={col.id}
-                  align={col.align ?? 'left'}
-                  style={{ minWidth: col.minWidth }}
-                  sx={{
-                    fontWeight: 'bold',
-                    backgroundColor: '#152230',
-                    color: '#7EDCE0',
-                    borderBottomColor: '#2A4A5C',
-                    fontSize: '0.8rem',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.04em',
-                  }}
-                >
-                  {col.sortable === false ? (
-                    col.label
-                  ) : (
-                    <TableSortLabel
-                      active={sortField === col.id}
-                      direction={sortField === col.id ? sortOrder : 'asc'}
-                      onClick={() => onSortChange(col.id as SortField)}
-                      sx={{
-                        '&.Mui-active': { color: '#2EC4B6' },
-                        '& .MuiTableSortLabel-icon': { color: '#2EC4B6 !important' },
-                      }}
-                    >
-                      {col.label}
-                    </TableSortLabel>
-                  )}
-                </TableCell>
-              ))}
-            </TableRow>
+              <TableRow>
+                {displayedColumns.map((col) => (
+                  <TableCell
+                    key={col.id}
+                    align={col.align ?? 'left'}
+                    style={{ minWidth: col.minWidth }}
+                    sx={{
+                      fontWeight: 'bold',
+                      backgroundColor: '#152230',
+                      color: '#7EDCE0',
+                      borderBottomColor: '#2A4A5C',
+                      fontSize: '0.8rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.04em',
+                    }}
+                  >
+                    {col.sortable === false ? (
+                      col.label
+                    ) : (
+                      <TableSortLabel
+                        active={sortField === col.id}
+                        direction={sortField === col.id ? sortOrder : 'asc'}
+                        onClick={() => onSortChange(col.id as SortField)}
+                        sx={{
+                          '&.Mui-active': { color: '#2EC4B6' },
+                          '& .MuiTableSortLabel-icon': { color: '#2EC4B6 !important' },
+                        }}
+                      >
+                        {col.label}
+                      </TableSortLabel>
+                    )}
+                  </TableCell>
+                ))}
+              </TableRow>
           </TableHead>
           <TableBody>
             {!loading && rows.length === 0 && (
               <TableRow>
-                <TableCell colSpan={columns.length} align="center" sx={{ py: 4 }}>
+                <TableCell colSpan={Math.max(displayedColumns.length, 1)} align="center" sx={{ py: 4 }}>
                   <Typography color="text.secondary">
                     No flaky tests found in the selected date range.
                   </Typography>
@@ -258,7 +325,7 @@ export default function FlakyTestTable({
                   '&:hover': { backgroundColor: 'rgba(46,196,182,0.04)' },
                 }}
               >
-                {columns.map((col) => (
+                {displayedColumns.map((col) => (
                   <TableCell key={col.id} align={col.align ?? 'left'}>
                     {col.format ? col.format(row) : String((row as unknown as Record<string, unknown>)[col.id])}
                   </TableCell>

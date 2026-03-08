@@ -6,7 +6,7 @@ services:
       - 'POSTGRES_USER=mura-dashboard'
       - 'POSTGRES_PASSWORD=mura4all!'
     ports:
-      - '5432:24391'
+      - '24391:5432'
     healthcheck:
       test: [
         CMD-SHELL,
