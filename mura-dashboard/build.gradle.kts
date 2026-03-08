@@ -6,6 +6,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("org.cyclonedx.bom") version "3.2.0"
     id("org.asciidoctor.jvm.convert") version "4.0.5"
+    id("com.github.node-gradle.node") version "7.1.0"
 }
 
 group = "com.github.mura-dashboard"
@@ -79,6 +80,30 @@ tasks.test {
 tasks.asciidoctor {
     inputs.dir(project.extra["snippetsDir"]!!)
     dependsOn(tasks.test)
+}
+
+node {
+    version.set("22.15.0")
+    download.set(true)
+    nodeProjectDir.set(file("frontend"))
+}
+
+val npmBuild = tasks.register<com.github.gradle.node.npm.task.NpmTask>("npmBuild") {
+    dependsOn(tasks.named("npmInstall"))
+    npmCommand.set(listOf("run", "build"))
+    inputs.dir("frontend/src")
+    inputs.file("frontend/package.json")
+    inputs.file("frontend/vite.config.ts")
+    inputs.file("frontend/tsconfig.json")
+    inputs.file("frontend/index.html")
+    outputs.dir("frontend/dist")
+}
+
+tasks.named<Copy>("processResources") {
+    dependsOn(npmBuild)
+    from("frontend/dist") {
+        into("static")
+    }
 }
 
 tasks.named<BootBuildImage>("bootBuildImage") {

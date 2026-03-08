@@ -42,6 +42,7 @@ public class TestCaseEntity {
      * Whether this test was detected as flaky. A test is flaky if it both
      * failed and succeeded across retries within the same report.
      */
+    @Column(name = "is_flaky")
     @Builder.Default
     private boolean flaky = false;
 
