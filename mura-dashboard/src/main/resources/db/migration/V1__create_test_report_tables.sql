@@ -1,8 +1,8 @@
 CREATE TABLE test_report (
     id             BIGINT GENERATED ALWAYS AS IDENTITY,
-    name           VARCHAR(1000)             NOT NULL,
-    module_path    VARCHAR(1000)             NOT NULL,
-    test_task_name VARCHAR(1000)             NOT NULL,
+    name           VARCHAR(4000)             NOT NULL,
+    module_path    VARCHAR(4000)             NOT NULL,
+    test_task_name VARCHAR(4000)             NOT NULL,
     created_at     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
     CONSTRAINT pk_test_report PRIMARY KEY (id)
 );
@@ -10,7 +10,7 @@ CREATE TABLE test_report (
 CREATE TABLE test_suite (
     id              BIGINT GENERATED ALWAYS AS IDENTITY,
     test_report_id  BIGINT                   NOT NULL,
-    name            VARCHAR(1000)            NOT NULL,
+    name            VARCHAR(4000)            NOT NULL,
     tests           INT                      NOT NULL,
     skipped         INT                      NOT NULL,
     failures        INT                      NOT NULL,
@@ -24,12 +24,12 @@ CREATE TABLE test_suite (
 CREATE TABLE test_case (
     id              BIGINT GENERATED ALWAYS AS IDENTITY,
     test_suite_id   BIGINT                   NOT NULL,
-    name            VARCHAR(1000)            NOT NULL,
-    classname       VARCHAR(1000)            NOT NULL,
+    name            VARCHAR(4000)            NOT NULL,
+    classname       VARCHAR(4000)            NOT NULL,
     time            DOUBLE PRECISION         NOT NULL,
     is_flaky        BOOLEAN                  NOT NULL DEFAULT FALSE,
     failure_message TEXT,
-    failure_type    VARCHAR(1000),
+    failure_type    TEXT,
     failure_details TEXT,
     CONSTRAINT pk_test_case PRIMARY KEY (id),
     CONSTRAINT fk_test_case_test_suite FOREIGN KEY (test_suite_id) REFERENCES test_suite(id)
