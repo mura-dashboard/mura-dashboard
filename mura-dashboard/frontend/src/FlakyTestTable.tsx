@@ -44,7 +44,7 @@ const columns: Column[] = [
     label: 'Test Class',
     minWidth: 250,
     format: (row) => (
-      <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+      <Typography variant="body2" sx={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '0.8rem', color: '#E8F4F8' }}>
         {row.classname}
       </Typography>
     ),
@@ -54,7 +54,7 @@ const columns: Column[] = [
     label: 'Test Method',
     minWidth: 180,
     format: (row) => (
-      <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+      <Typography variant="body2" sx={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '0.8rem', color: '#7EDCE0' }}>
         {row.name}
       </Typography>
     ),
@@ -138,8 +138,15 @@ export default function FlakyTestTable({
   }
 
   return (
-    <Paper variant="outlined">
-      {loading && <LinearProgress />}
+    <Paper
+      variant="outlined"
+      sx={{
+        borderColor: '#2A4A5C',
+        borderRadius: 2,
+        overflow: 'hidden',
+      }}
+    >
+      {loading && <LinearProgress color="primary" />}
       <TableContainer sx={{ maxHeight: 'calc(100vh - 260px)' }}>
         <Table stickyHeader size="small">
           <TableHead>
@@ -149,12 +156,24 @@ export default function FlakyTestTable({
                   key={col.id}
                   align={col.align ?? 'left'}
                   style={{ minWidth: col.minWidth }}
-                  sx={{ fontWeight: 'bold', backgroundColor: 'grey.100' }}
+                  sx={{
+                    fontWeight: 'bold',
+                    backgroundColor: '#152230',
+                    color: '#7EDCE0',
+                    borderBottomColor: '#2A4A5C',
+                    fontSize: '0.8rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                  }}
                 >
                   <TableSortLabel
                     active={sortField === col.id}
                     direction={sortField === col.id ? sortOrder : 'asc'}
                     onClick={() => onSortChange(col.id)}
+                    sx={{
+                      '&.Mui-active': { color: '#2EC4B6' },
+                      '& .MuiTableSortLabel-icon': { color: '#2EC4B6 !important' },
+                    }}
                   >
                     {col.label}
                   </TableSortLabel>
@@ -173,7 +192,13 @@ export default function FlakyTestTable({
               </TableRow>
             )}
             {rows.map((row, idx) => (
-              <TableRow hover key={`${row.classname}-${row.name}-${idx}`}>
+              <TableRow
+                hover
+                key={`${row.classname}-${row.name}-${idx}`}
+                sx={{
+                  '&:hover': { backgroundColor: 'rgba(46,196,182,0.04)' },
+                }}
+              >
                 {columns.map((col) => (
                   <TableCell key={col.id} align={col.align ?? 'left'}>
                     {col.format ? col.format(row) : String((row as unknown as Record<string, unknown>)[col.id])}
@@ -192,6 +217,7 @@ export default function FlakyTestTable({
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={onRowsPerPageChange}
         rowsPerPageOptions={[10, 20, 50, 100]}
+        sx={{ borderTop: '1px solid #2A4A5C' }}
       />
     </Paper>
   );

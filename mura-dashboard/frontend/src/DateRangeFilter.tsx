@@ -1,4 +1,4 @@
-import {Box, Button, Stack, TextField} from '@mui/material';
+import {Button, Paper, Stack, TextField, Typography} from '@mui/material';
 import {FilterList} from '@mui/icons-material';
 import dayjs from 'dayjs';
 import {useState} from 'react';
@@ -26,8 +26,22 @@ export default function DateRangeFilter({ from, to, onChange }: DateRangeFilterP
   };
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-      <FilterList color="action" />
+    <Paper
+      variant="outlined"
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 2,
+        flexWrap: 'wrap',
+        p: 2,
+        borderColor: '#2A4A5C',
+        borderRadius: 2,
+      }}
+    >
+      <FilterList sx={{ color: '#2EC4B6' }} />
+      <Typography variant="body2" sx={{ color: '#8BA8B8', fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>
+        Date Range
+      </Typography>
       <TextField
         label="From"
         type="date"
@@ -35,6 +49,12 @@ export default function DateRangeFilter({ from, to, onChange }: DateRangeFilterP
         value={localFrom}
         onChange={e => setLocalFrom(e.target.value)}
         slotProps={{ inputLabel: { shrink: true } }}
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': { borderColor: '#2A4A5C' },
+            '&:hover fieldset': { borderColor: '#2EC4B6' },
+          },
+        }}
       />
       <TextField
         label="To"
@@ -43,6 +63,12 @@ export default function DateRangeFilter({ from, to, onChange }: DateRangeFilterP
         value={localTo}
         onChange={e => setLocalTo(e.target.value)}
         slotProps={{ inputLabel: { shrink: true } }}
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': { borderColor: '#2A4A5C' },
+            '&:hover fieldset': { borderColor: '#2EC4B6' },
+          },
+        }}
       />
       <Button variant="contained" size="small" onClick={handleApply}>
         Apply
@@ -58,6 +84,6 @@ export default function DateRangeFilter({ from, to, onChange }: DateRangeFilterP
           Last 30d
         </Button>
       </Stack>
-    </Box>
+    </Paper>
   );
 }
