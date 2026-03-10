@@ -13,6 +13,7 @@ public record FlakyTestSummary(
         @Schema(description = "Test method name") String name,
         @Schema(description = "Total number of runs in the date range") long totalRuns,
         @Schema(description = "Number of times the test was marked flaky") long flakyCount,
+        @Schema(description = "Number of runs that failed (non-flaky failures)") long errorCount,
         @Schema(description = "Flakiness rate (flakyCount / totalRuns)", example = "0.25") double flakinessRate,
         @Schema(description = "Last time this test was seen") Instant lastSeen,
         @Schema(description = "Test status: FLAKY, FAILED, or SUCCESSFUL") String testStatus

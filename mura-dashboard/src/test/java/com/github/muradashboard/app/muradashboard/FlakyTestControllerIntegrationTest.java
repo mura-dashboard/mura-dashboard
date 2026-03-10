@@ -63,13 +63,16 @@ class FlakyTestControllerIntegrationTest {
                 // Default sort is flakyCount desc: BetaTest(7) > AlphaTest(3) > GammaTest(1)
                 .andExpect(jsonPath("$.content[0].classname").value("com.example.BetaTest"))
                 .andExpect(jsonPath("$.content[0].flakyCount").value(7))
+                .andExpect(jsonPath("$.content[0].errorCount").value(0))
                 .andExpect(jsonPath("$.content[0].reportName").value("my-project"))
                 .andExpect(jsonPath("$.content[0].modulePath").value(":"))
                 .andExpect(jsonPath("$.content[0].testTaskName").value("test"))
                 .andExpect(jsonPath("$.content[1].classname").value("com.example.AlphaTest"))
                 .andExpect(jsonPath("$.content[1].flakyCount").value(3))
+                .andExpect(jsonPath("$.content[1].errorCount").value(0))
                 .andExpect(jsonPath("$.content[2].classname").value("com.example.GammaTest"))
-                .andExpect(jsonPath("$.content[2].flakyCount").value(1));
+                .andExpect(jsonPath("$.content[2].flakyCount").value(1))
+                .andExpect(jsonPath("$.content[2].errorCount").value(0));
     }
 
     @Test
@@ -172,6 +175,7 @@ class FlakyTestControllerIntegrationTest {
                 .andExpect(jsonPath("$.content[0].classname").value("com.example.FlakyTest"))
                 .andExpect(jsonPath("$.content[0].totalRuns").value(7))       // 3 + 4
                 .andExpect(jsonPath("$.content[0].flakyCount").value(3))      // 2 + 1
+                .andExpect(jsonPath("$.content[0].errorCount").value(0))
                 .andExpect(jsonPath("$.content[0].reportName").value("my-project"))
                 .andExpect(jsonPath("$.content[0].modulePath").value(":"))
                 .andExpect(jsonPath("$.content[0].testTaskName").value("test"));
@@ -248,7 +252,56 @@ class FlakyTestControllerIntegrationTest {
                 .andExpect(jsonPath("$.content", hasSize(1)))
                 .andExpect(jsonPath("$.content[0].classname").value("com.example.RetryTest"))
                 .andExpect(jsonPath("$.content[0].totalRuns").value(1))
-                .andExpect(jsonPath("$.content[0].flakyCount").value(1));
+                .andExpect(jsonPath("$.content[0].flakyCount").value(1))
+                .andExpect(jsonPath("$.content[0].errorCount").value(0));
+    }
+
+    @Test
+    void shouldReturnErrorCountForFailedNonFlakyTests() throws Exception {
+        Instant now = Instant.now();
+        // AlphaTest: 5 runs, 2 flaky, 1 failed (non-flaky with failureMessage)
+        insertFlakyTestData("com.example.AlphaTest", "testA", "my-project", ":", "test", 5, 2, now.minus(1, ChronoUnit.DAYS));
+        insertFailedTestData("com.example.AlphaTest", "testA", "my-project", ":", "test", 1, now.minus(1, ChronoUnit.DAYS).plusSeconds(100));
+        // BetaTest: 6 runs, 1 flaky, 3 failed
+        insertFlakyTestData("com.example.BetaTest", "testB", "my-project", ":", "test", 6, 1, now.minus(2, ChronoUnit.DAYS));
+        insertFailedTestData("com.example.BetaTest", "testB", "my-project", ":", "test", 3, now.minus(2, ChronoUnit.DAYS).plusSeconds(100));
+
+        mockMvc.perform(get("/rapi/flaky-tests")
+                        .param("statuses", "FLAKY", "FAILED"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                // Default sort is flakyCount desc: AlphaTest(2) > BetaTest(1)
+                .andExpect(jsonPath("$.content[0].classname").value("com.example.AlphaTest"))
+                .andExpect(jsonPath("$.content[0].flakyCount").value(2))
+                .andExpect(jsonPath("$.content[0].errorCount").value(1))
+                .andExpect(jsonPath("$.content[0].totalRuns").value(6))   // 5 + 1 failed
+                .andExpect(jsonPath("$.content[1].classname").value("com.example.BetaTest"))
+                .andExpect(jsonPath("$.content[1].flakyCount").value(1))
+                .andExpect(jsonPath("$.content[1].errorCount").value(3))
+                .andExpect(jsonPath("$.content[1].totalRuns").value(9));  // 6 + 3 failed
+    }
+
+    @Test
+    void shouldSortByErrorCount() throws Exception {
+        Instant now = Instant.now();
+        // AlphaTest: 3 flaky, 1 error
+        insertFlakyTestData("com.example.AlphaTest", "testA", "my-project", ":", "test", 5, 3, now.minus(1, ChronoUnit.DAYS));
+        insertFailedTestData("com.example.AlphaTest", "testA", "my-project", ":", "test", 1, now.minus(1, ChronoUnit.DAYS).plusSeconds(100));
+        // BetaTest: 2 flaky, 4 errors
+        insertFlakyTestData("com.example.BetaTest", "testB", "my-project", ":", "test", 4, 2, now.minus(2, ChronoUnit.DAYS));
+        insertFailedTestData("com.example.BetaTest", "testB", "my-project", ":", "test", 4, now.minus(2, ChronoUnit.DAYS).plusSeconds(100));
+
+        mockMvc.perform(get("/rapi/flaky-tests")
+                        .param("sort", "errorCount")
+                        .param("order", "desc")
+                        .param("statuses", "FLAKY", "FAILED"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                // desc by errorCount: BetaTest(4) > AlphaTest(1)
+                .andExpect(jsonPath("$.content[0].classname").value("com.example.BetaTest"))
+                .andExpect(jsonPath("$.content[0].errorCount").value(4))
+                .andExpect(jsonPath("$.content[1].classname").value("com.example.AlphaTest"))
+                .andExpect(jsonPath("$.content[1].errorCount").value(1));
     }
 
     /**
@@ -333,5 +386,47 @@ class FlakyTestControllerIntegrationTest {
             report.getTestSuites().add(suite);
             entityManager.persist(report);
         });
+    }
+
+    /**
+     * Inserts {@code count} separate reports each containing a single non-flaky test case
+     * with a failure message set (simulating real test errors). These count toward
+     * the errorCount (failedCount) aggregate.
+     */
+    private void insertFailedTestData(String classname, String name,
+                                       String reportName, String modulePath, String testTaskName,
+                                       int count, Instant createdAt) {
+        for (int i = 0; i < count; i++) {
+            final int reportIndex = i;
+            transactionTemplate.executeWithoutResult(status -> {
+                TestReportEntity report = new TestReportEntity();
+                report.setName(reportName);
+                report.setModulePath(modulePath);
+                report.setTestTaskName(testTaskName);
+                report.setCreatedAt(createdAt.plusSeconds(reportIndex));
+
+                TestSuiteEntity suite = new TestSuiteEntity();
+                suite.setName("suite-" + classname);
+                suite.setTests(1);
+                suite.setSkipped(0);
+                suite.setFailures(1);
+                suite.setErrors(0);
+                suite.setTimestamp(createdAt.plusSeconds(reportIndex));
+                suite.setTime(1.0);
+                suite.setTestReport(report);
+
+                TestCaseEntity testCase = new TestCaseEntity();
+                testCase.setClassname(classname);
+                testCase.setName(name);
+                testCase.setTime(0.1);
+                testCase.setFlaky(false);
+                testCase.setFailureMessage("Expected true but was false");
+                testCase.setTestSuite(suite);
+                suite.getTestCases().add(testCase);
+
+                report.getTestSuites().add(suite);
+                entityManager.persist(report);
+            });
+        }
     }
 }

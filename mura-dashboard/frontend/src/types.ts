@@ -10,6 +10,7 @@ export interface FlakyTestSummary {
   name: string;
   totalRuns: number;
   flakyCount: number;
+  errorCount: number;
   flakinessRate: number;
   lastSeen: string;
   testStatus: TestStatus;
@@ -23,5 +24,5 @@ export interface FlakyTestPageResponse {
   totalPages: number;
 }
 
-export type SortField = 'flakyCount' | 'flakinessRate' | 'totalRuns' | 'lastSeen' | 'classname' | 'name' | 'reportName' | 'modulePath' | 'testTaskName';
+export type SortField = 'flakyCount' | 'flakinessRate' | 'totalRuns' | 'lastSeen' | 'classname' | 'name' | 'reportName' | 'modulePath' | 'testTaskName' | 'errorCount';
 export type SortOrder = 'asc' | 'desc';

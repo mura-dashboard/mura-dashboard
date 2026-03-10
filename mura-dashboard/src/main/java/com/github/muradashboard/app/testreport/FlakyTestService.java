@@ -39,6 +39,7 @@ public class FlakyTestService {
                             (String) row[4],  // name
                             ((Number) row[5]).longValue(),  // totalRuns
                             flakyCount,
+                            failedCount,  // errorCount
                             ((Number) row[7]).doubleValue(),  // flakinessRate
                             toInstant(row[8]),  // lastSeen
                             testStatus

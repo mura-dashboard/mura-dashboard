@@ -16,7 +16,7 @@ public class FlakyTestQueryRepository {
 
     private static final Set<String> ALLOWED_SORT_COLUMNS = Set.of(
             "flakycount", "flakinessrate", "totalruns", "lastseen", "classname", "name",
-            "reportname", "modulepath", "testtaskname"
+            "reportname", "modulepath", "testtaskname", "errorcount"
     );
 
     private static final Set<String> ALLOWED_STATUSES = Set.of("FLAKY", "FAILED", "SUCCESSFUL");
@@ -63,6 +63,10 @@ public class FlakyTestQueryRepository {
         String safeSort = ALLOWED_SORT_COLUMNS.contains(sortColumn.toLowerCase())
                 ? sortColumn.toLowerCase()
                 : "flakycount";
+        // Map frontend field name to SQL alias
+        if ("errorcount".equals(safeSort)) {
+            safeSort = "failedcount";
+        }
         String safeDir = "asc".equalsIgnoreCase(sortDirection) ? "ASC" : "DESC";
 
         String having = buildHavingClause(statuses);

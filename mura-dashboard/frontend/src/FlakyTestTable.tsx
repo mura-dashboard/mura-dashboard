@@ -131,6 +131,13 @@ const columns: Column[] = [
     format: (row) => row.flakyCount,
   },
   {
+    id: 'errorCount',
+    label: 'Error Count',
+    align: 'right',
+    minWidth: 110,
+    format: (row) => row.errorCount,
+  },
+  {
     id: 'totalRuns',
     label: 'Total Runs',
     align: 'right',
