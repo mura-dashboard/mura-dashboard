@@ -4,7 +4,7 @@ plugins {
     java
     id("org.springframework.boot") version "4.0.3"
     id("io.spring.dependency-management") version "1.1.7"
-    id("org.cyclonedx.bom") version "3.2.0"
+    id("org.cyclonedx.bom") version "3.2.1"
     id("org.asciidoctor.jvm.convert") version "4.0.5"
     id("com.github.node-gradle.node") version "7.1.0"
 }
