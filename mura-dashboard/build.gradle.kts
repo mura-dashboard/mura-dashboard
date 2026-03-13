@@ -88,6 +88,19 @@ node {
     nodeProjectDir.set(file("frontend"))
 }
 
+val npmTest = tasks.register<com.github.gradle.node.npm.task.NpmTask>("npmTest") {
+    dependsOn(tasks.named("npmInstall"))
+    npmCommand.set(listOf("run", "test"))
+    inputs.dir("frontend/src")
+    inputs.file("frontend/package.json")
+    inputs.file("frontend/vite.config.ts")
+    inputs.file("frontend/tsconfig.json")
+}
+
+tasks.named("check") {
+    dependsOn(npmTest)
+}
+
 val npmBuild = tasks.register<com.github.gradle.node.npm.task.NpmTask>("npmBuild") {
     dependsOn(tasks.named("npmInstall"))
     npmCommand.set(listOf("run", "build"))
@@ -95,6 +108,7 @@ val npmBuild = tasks.register<com.github.gradle.node.npm.task.NpmTask>("npmBuild
     inputs.file("frontend/package.json")
     inputs.file("frontend/vite.config.ts")
     inputs.file("frontend/tsconfig.json")
+    inputs.file("frontend/tsconfig.build.json")
     inputs.file("frontend/index.html")
     outputs.dir("frontend/dist")
 }

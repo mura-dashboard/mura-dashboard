@@ -44,14 +44,26 @@ docker compose up
 
 ```bash
 cd mura-dashboard
-./gradlew check        # runs all tests
-./gradlew test         # unit + integration tests only
+./gradlew check        # runs all tests (backend + frontend)
+./gradlew test         # backend unit + integration tests only
+./gradlew npmTest      # frontend tests only
+
+# Frontend tests directly via npm
+cd mura-dashboard/frontend
+npm run test           # runs vitest once (CI mode)
 ```
 
+### Backend
 - **Frameworks:** JUnit 5, Spring Boot Test (`@SpringBootTest` + `@AutoConfigureMockMvc`), MockMvc, Spring REST Docs, Testcontainers (PostgreSQL 18)
 - **Docker required:** Testcontainers starts a real PostgreSQL instance — Docker must be running
 - **Test data seeder:** `TestDataConfiguration` + `TestMuraDashboardApplication` for local dev with sample data
-- **No frontend tests** are configured
+
+### Frontend
+- **Frameworks:** Vitest 4, React Testing Library, jest-dom, user-event, jsdom
+- **Config:** Vitest is configured in `vite.config.ts` (`test` block), with a setup file at `src/test-setup.ts`
+- **TypeScript:** `tsconfig.build.json` extends `tsconfig.json` but excludes test files from the `tsc -b` build compilation
+- **Test files** are colocated with source files in `frontend/src/` using the `*.test.ts(x)` naming convention
+- **Gradle integration:** The `npmTest` task runs `npm run test` and is wired into the `check` lifecycle, so `./gradlew build` runs both backend and frontend tests
 
 ## Code Conventions — Java
 

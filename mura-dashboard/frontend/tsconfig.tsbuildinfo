@@ -1,1 +1,1 @@
-{"root":["./src/App.tsx","./src/DateRangeFilter.tsx","./src/FlakyTestTable.tsx","./src/TestStatusFilter.tsx","./src/api.ts","./src/main.tsx","./src/types.ts"],"version":"5.9.3"}
+{"root":["./src/App.test.tsx","./src/App.tsx","./src/DateRangeFilter.test.tsx","./src/DateRangeFilter.tsx","./src/FlakyTestTable.test.tsx","./src/FlakyTestTable.tsx","./src/TestStatusFilter.test.tsx","./src/TestStatusFilter.tsx","./src/api.test.ts","./src/api.ts","./src/main.tsx","./src/test-setup.ts","./src/types.test.ts","./src/types.ts"],"errors":true,"version":"5.9.3"}
