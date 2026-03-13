@@ -1,0 +1,84 @@
+name: Release Docker Image
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g. 1.2.3), without "v" prefix'
+        required: false
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup JDK 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Run tests
+        working-directory: mura-dashboard
+        run: ./gradlew check
+
+      - name: Build Docker image
+        working-directory: mura-dashboard
+        run: ./gradlew bootBuildImage
+
+      - name: Extract version
+        id: version
+        run: |
+          if [[ -n "${{ inputs.version }}" ]]; then
+            VERSION="${{ inputs.version }}"
+          elif [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          else
+            VERSION=""
+          fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+          if [[ -n "$VERSION" ]]; then
+            MAJOR="${VERSION%%.*}"
+            MINOR="${VERSION#*.}"
+            MINOR="${MINOR%%.*}"
+            echo "major=$MAJOR" >> "$GITHUB_OUTPUT"
+            echo "minor=$MAJOR.$MINOR" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Tag and push image
+        run: |
+          IMAGE="docker.io/muradashboard/mura-dashboard"
+
+          docker push "$IMAGE:latest"
+
+          VERSION="${{ steps.version.outputs.version }}"
+          if [[ -n "$VERSION" ]]; then
+            docker tag "$IMAGE:latest" "$IMAGE:$VERSION"
+            docker push "$IMAGE:$VERSION"
+
+            MINOR="${{ steps.version.outputs.minor }}"
+            docker tag "$IMAGE:latest" "$IMAGE:$MINOR"
+            docker push "$IMAGE:$MINOR"
+
+            MAJOR="${{ steps.version.outputs.major }}"
+            docker tag "$IMAGE:latest" "$IMAGE:$MAJOR"
+            docker push "$IMAGE:$MAJOR"
+          fi
