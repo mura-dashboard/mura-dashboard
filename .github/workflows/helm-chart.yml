@@ -1,0 +1,33 @@
+name: Helm Chart Lint & Test
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'mura-dashboard-helm-chart/**'
+  pull_request:
+    paths:
+      - 'mura-dashboard-helm-chart/**'
+  workflow_dispatch:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v4.1.3
+
+      - name: Install kubeconform
+        run: |
+          KUBECONFORM_VERSION="v0.7.0"
+          curl -fsSL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" \
+            | tar xz -C /usr/local/bin kubeconform
+
+      - name: Run chart tests
+        run: ./mura-dashboard-helm-chart/ci-test.sh
