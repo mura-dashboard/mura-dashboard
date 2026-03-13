@@ -1,0 +1,3 @@
+{{- if and .Values.ingress.enabled .Values.gatewayApi.enabled -}}
+{{- fail "ingress.enabled and gatewayApi.enabled are mutually exclusive — enable only one" -}}
+{{- end -}}

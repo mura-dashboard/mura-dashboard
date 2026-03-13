@@ -1,6 +1,13 @@
 Thank you for installing {{ include "mura-dashboard.fullname" . }}!
 
-{{- if .Values.ingress.enabled }}
+{{- if .Values.gatewayApi.enabled }}
+
+Mura Dashboard is accessible via Gateway API HTTPRoute:
+{{- range .Values.gatewayApi.hostnames }}
+  http://{{ . }}
+{{- end }}
+
+{{- else if .Values.ingress.enabled }}
 
 Mura Dashboard is accessible via Ingress:
 {{- range $host := .Values.ingress.hosts }}
