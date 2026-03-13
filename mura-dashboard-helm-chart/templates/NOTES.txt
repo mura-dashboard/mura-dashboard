@@ -1,0 +1,40 @@
+Thank you for installing {{ include "mura-dashboard.fullname" . }}!
+
+{{- if .Values.ingress.enabled }}
+
+Mura Dashboard is accessible via Ingress:
+{{- range $host := .Values.ingress.hosts }}
+  {{- range .paths }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
+  {{- end }}
+{{- end }}
+
+{{- else if contains "NodePort" .Values.service.type }}
+
+Get the application URL by running:
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "mura-dashboard.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+
+{{- else if contains "LoadBalancer" .Values.service.type }}
+
+Get the application URL by running:
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+  kubectl get --namespace {{ .Release.Namespace }} svc {{ include "mura-dashboard.fullname" . }} -w
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "mura-dashboard.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo http://$SERVICE_IP:{{ .Values.service.port }}
+
+{{- else if contains "ClusterIP" .Values.service.type }}
+
+Get the application URL by running:
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "{{ include "mura-dashboard.selectorLabels" . | replace "\n" "," }}" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  echo "Visit http://127.0.0.1:8080 to use Mura Dashboard"
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:$CONTAINER_PORT
+
+{{- end }}
+
+Dashboard (public):  /rapi/flaky-tests
+API (authenticated): /api/test-reports
+Health check:        /actuator/health
+Swagger UI:          /swagger-ui/index.html

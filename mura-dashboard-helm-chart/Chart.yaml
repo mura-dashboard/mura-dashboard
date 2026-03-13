@@ -1,0 +1,22 @@
+apiVersion: v2
+name: mura-dashboard
+description: A Helm chart for Mura Dashboard — a flaky test tracking and visualization application
+type: application
+version: 0.0.1
+appVersion: "0.0.1"
+
+keywords:
+  - mura-dashboard
+  - flaky-tests
+  - testing
+  - spring-boot
+
+home: https://github.com/muradashboard/mura-dashboard
+sources:
+  - https://github.com/muradashboard/mura-dashboard
+
+dependencies:
+  - name: postgresql
+    version: "~18"
+    repository: oci://registry-1.docker.io/bitnamicharts
+    condition: postgresql.enabled
