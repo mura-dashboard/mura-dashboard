@@ -1,0 +1,39 @@
+name: Helm Chart Publish
+
+on:
+  push:
+    tags:
+      - 'chart-v*'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v4.1.3
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io --username "${{ github.actor }}" --password-stdin
+
+      - name: Build dependencies
+        run: helm dependency build mura-dashboard-helm-chart/
+
+      - name: Package chart
+        id: package
+        run: |
+          helm package mura-dashboard-helm-chart/
+          echo "package=$(ls mura-dashboard-*.tgz)" >> "$GITHUB_OUTPUT"
+
+      - name: Push to GHCR
+        run: helm push "${{ steps.package.outputs.package }}" "oci://ghcr.io/${{ github.repository_owner }}"
