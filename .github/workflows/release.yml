@@ -28,13 +28,9 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
 
-      - name: Run tests
+      - name: Run tests and build Docker image
         working-directory: mura-dashboard
-        run: ./gradlew check
-
-      - name: Build Docker image
-        working-directory: mura-dashboard
-        run: ./gradlew bootBuildImage
+        run: ./gradlew check bootBuildImage
 
       - name: Extract version
         id: version
