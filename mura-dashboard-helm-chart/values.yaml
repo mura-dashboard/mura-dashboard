@@ -110,6 +110,12 @@ volumeMounts: []
 # Application-specific configuration
 # ============================================================================
 
+# -- Name of an existing Secret containing credentials.
+# If set, the chart will not create its own Secret.
+# The Secret must contain keys: spring-security-username, spring-security-password,
+# datasource-username, datasource-password
+existingSecret: ""
+
 spring:
   security:
     # -- Spring Security username for API authentication

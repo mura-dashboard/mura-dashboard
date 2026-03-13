@@ -48,24 +48,24 @@ spec:
             - name: SPRING_SECURITY_USER_NAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "mura-dashboard.fullname" . }}
+                  name: {{ include "mura-dashboard.secretName" . }}
                   key: spring-security-username
             - name: SPRING_SECURITY_USER_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "mura-dashboard.fullname" . }}
+                  name: {{ include "mura-dashboard.secretName" . }}
                   key: spring-security-password
             - name: SPRING_DATASOURCE_URL
               value: {{ include "mura-dashboard.datasourceUrl" . | quote }}
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "mura-dashboard.fullname" . }}
+                  name: {{ include "mura-dashboard.secretName" . }}
                   key: datasource-username
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "mura-dashboard.fullname" . }}
+                  name: {{ include "mura-dashboard.secretName" . }}
                   key: datasource-password
             - name: THC_PATH
               value: /actuator/health

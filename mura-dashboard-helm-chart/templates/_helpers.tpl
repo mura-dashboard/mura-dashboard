@@ -62,6 +62,18 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
+Resolve the Secret name to use for credentials.
+If existingSecret is set, use that; otherwise fall back to the chart-generated Secret.
+*/}}
+{{- define "mura-dashboard.secretName" -}}
+{{- if .Values.existingSecret }}
+{{- .Values.existingSecret }}
+{{- else }}
+{{- include "mura-dashboard.fullname" . }}
+{{- end }}
+{{- end }}
+
+{{/*
 Compute the JDBC datasource URL.
 When the Bitnami PostgreSQL subchart is enabled, construct the URL from the subchart service name.
 Otherwise, use the externalDatabase values.
