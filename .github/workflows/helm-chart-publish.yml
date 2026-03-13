@@ -24,7 +24,7 @@ jobs:
           version: v4.1.3
 
       - name: Login to GHCR
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io --username "${{ github.actor }}" --password-stdin
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io --username "${{ github.repository_owner }}" --password-stdin
 
       - name: Build dependencies
         run: helm dependency build mura-dashboard-helm-chart/
