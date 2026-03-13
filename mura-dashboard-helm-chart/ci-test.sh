@@ -71,10 +71,21 @@ else
   fail "helm lint (external DB + ingress + HPA)"
 fi
 
+info "Linting chart (Gateway API + HPA) …"
+if helm lint "$CHART_DIR" --quiet \
+  --set gatewayApi.enabled=true \
+  --set gatewayApi.parentRefs[0].name=my-gateway \
+  --set autoscaling.enabled=true; then
+  pass "helm lint (Gateway API + HPA)"
+else
+  fail "helm lint (Gateway API + HPA)"
+fi
+
 # ── 3. Template rendering ───────────────────────────────────────────────────
 TEMPLATE_DEFAULT=$(mktemp)
 TEMPLATE_EXTERNAL=$(mktemp)
-trap 'rm -f "$TEMPLATE_DEFAULT" "$TEMPLATE_EXTERNAL"' EXIT
+TEMPLATE_GATEWAY=$(mktemp)
+trap 'rm -f "$TEMPLATE_DEFAULT" "$TEMPLATE_EXTERNAL" "$TEMPLATE_GATEWAY"' EXIT
 
 info "Rendering templates (default values) …"
 if helm template test-release "$CHART_DIR" > "$TEMPLATE_DEFAULT"; then
@@ -93,6 +104,16 @@ if helm template test-release "$CHART_DIR" \
   pass "helm template (external DB + ingress + HPA)"
 else
   fail "helm template (external DB + ingress + HPA)"
+fi
+
+info "Rendering templates (Gateway API + HPA) …"
+if helm template test-release "$CHART_DIR" \
+  --set gatewayApi.enabled=true \
+  --set gatewayApi.parentRefs[0].name=my-gateway \
+  --set autoscaling.enabled=true > "$TEMPLATE_GATEWAY"; then
+  pass "helm template (Gateway API + HPA)"
+else
+  fail "helm template (Gateway API + HPA)"
 fi
 
 # ── 4. Kubeconform schema validation ────────────────────────────────────────
@@ -117,6 +138,13 @@ if $HAVE_KUBECONFORM; then
     pass "kubeconform (external DB + ingress + HPA)"
   else
     fail "kubeconform (external DB + ingress + HPA)"
+  fi
+
+  info "Validating schemas (Gateway API + HPA) …"
+  if kubeconform "${KUBECONFORM_ARGS[@]}" < "$TEMPLATE_GATEWAY"; then
+    pass "kubeconform (Gateway API + HPA)"
+  else
+    fail "kubeconform (Gateway API + HPA)"
   fi
 fi
 

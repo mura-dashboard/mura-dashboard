@@ -71,6 +71,28 @@ ingress:
   #    hosts:
   #      - mura-dashboard.local
 
+gatewayApi:
+  # -- Enable Gateway API HTTPRoute (mutually exclusive with ingress.enabled)
+  enabled: false
+  # -- Annotations to add to the HTTPRoute
+  annotations: {}
+  # -- Parent gateway references
+  parentRefs:
+    - name: ""
+      # -- Namespace of the gateway (optional, defaults to the HTTPRoute namespace)
+      # namespace: ""
+      # -- SectionName of the gateway listener to attach to (optional)
+      # sectionName: ""
+  # -- Hostnames for the HTTPRoute
+  hostnames:
+    - mura-dashboard.local
+  # -- HTTP routing rules (backendRefs are added automatically)
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+
 resources:
   requests:
     cpu: 250m
