@@ -33,7 +33,7 @@ jobs:
         id: package
         run: |
           helm package mura-dashboard-helm-chart/
-          echo "package=$(ls mura-dashboard-*.tgz)" >> "$GITHUB_OUTPUT"
+          echo "package=$(ls mura-dashboard-helm-chart-*.tgz)" >> "$GITHUB_OUTPUT"
 
       - name: Push to GHCR
         run: helm push "${{ steps.package.outputs.package }}" "oci://ghcr.io/${{ github.repository_owner }}"

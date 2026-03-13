@@ -39,3 +39,7 @@ out/
 ### Frontend ###
 **/node_modules/
 
+### Helm Chart ###
+**/mura-dashboard-helm-chart-*.tgz
+mura-dashboard-helm-chart/charts/
+mura-dashboard-helm-chart-*/
