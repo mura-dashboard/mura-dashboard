@@ -83,7 +83,7 @@ tasks.asciidoctor {
 }
 
 node {
-    version.set("22.15.0")
+    version.set("24.14.0")
     download.set(true)
     nodeProjectDir.set(file("frontend"))
 }

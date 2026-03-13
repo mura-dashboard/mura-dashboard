@@ -38,7 +38,7 @@ cd mura-dashboard
 docker compose up
 ```
 
-**Prerequisites:** JDK 25, Docker (for Testcontainers and PostgreSQL). Node 22.15.0 is auto-downloaded by the Gradle Node plugin.
+**Prerequisites:** JDK 25, Docker (for Testcontainers and PostgreSQL). Node 24.14.0 is auto-downloaded by the Gradle Node plugin.
 
 ## Testing
 
