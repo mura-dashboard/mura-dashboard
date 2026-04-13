@@ -33,7 +33,7 @@ extra["snippetsDir"] = file("build/generated-snippets")
 
 dependencyManagement {
     dependencies {
-        dependency("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
+        dependency("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
     }
 }
 
